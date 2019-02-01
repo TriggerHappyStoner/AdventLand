@@ -141,15 +141,15 @@ function AutoAcceptSelfInvite(){
 	for (IndexNum in arraySelfNames) {
 		otherself = arraySelfNames[IndexNum];
 		if(otherself!=character.name && otherself!=""){
-		GL("srchAAcpt:"+otherself);
-		GL("srchAI:"+on_party_request(otherself))
+		//GL("srchAAcpt:"+otherself);
+		//GL("srchAI:"+on_party_request(otherself))
 		
 			//if(on_party_request(otherself)){
 				//GL("autoinvite from:"+otherself);
 				//accept_party_request(otherself);
 				//var accepted = accept_party_invite(otherself)
 				accept_party_invite(otherself);
-				GL("Autoaccepted:"+otherself);
+				//GL("Autoaccepted:"+otherself);
 				//parent.socket.emit('party', {event: 'accept', name: otherself});
 				
 				
@@ -371,14 +371,15 @@ function HealerMode() {
 }
 
  function TankMode(){
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
+	
+	//var current = get_nearest_monster()
+	var current = get_nearest_hostile()
+	
+	if(can_use("taunt")){CastSpell("taunt",current)};
+	
+	
+	
+	
  }
 
 
