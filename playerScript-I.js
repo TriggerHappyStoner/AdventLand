@@ -16,11 +16,12 @@ lmtr_InviteCheck				= 10
 TSOL_healspl					= 0
 TSOL_healhppot					= 0
 TSOL_healmppot					= 0
-TTNA_AutoInviteWait				= 600
 sentInvite						= 0
 arraySelfNames 					= (arraySelfNamesE + "," + arraySelfNamesP).split(",")
-//var TSOL_inviteout					= New DateTime(0) + -1 * TTNA_AutoInviteWait  --fails
+//var TSOL_inviteout					= New DateTime(0) + -1 * next_AutoInviteWait  --fails
+TSOL_AInviteSent				= 0
 TSOL_inviteout					= 0
+next_AutoInviteWait				= 1200
 next_InviteOut					= 0
 next_InviteCheck				= 0
 next_HealTarget					= ""
@@ -93,16 +94,16 @@ function CastHeal(target){
 function AutoInvite(){
 	//sentInvite = 0;
 	//GL(new Date)
-	createParty= 0;
+	//createParty= 0;
 	//GL("AInvTS:"+TSOL_InviteCheck>next_InviteOut);
-	//GL((TSOL_InviteCheck>next_InviteOut && TSOL_inviteout!=0) && sentInvite);
-	//GL(TSOL_InviteCheck>next_InviteOut && TSOL_inviteout!=0 && sentInvite);
-	if(TSOL_InviteCheck>next_InviteOut && TSOL_inviteout!=0 && sentInvite){sentInvite=0; return sentInvite};    //fails
-	//if(TSOL_inviteout>=(New Date(0)+TTNA_AutoInviteWait)){return sentInvite};
-	if(!character.party){createParty=1};
+	//GL((TSOL_InviteCheck>next_InviteOut && TSOL_AInviteSent!=0) && sentInvite);
+	//GL(TSOL_InviteCheck>next_InviteOut && TSOL_AInviteSent!=0 && sentInvite);
+	//if(TSOL_AInviteSent!=0 && sentInvite){sentInvite=0; return sentInvite};    //fails
+	//if(TSOL_AInviteSent>=(New Date(0)+next_AutoInviteWait)){return sentInvite};
+	//if(!character.party){createParty=1};
 	//GL(arraySelfNames)
-	if(createParty){
-	TSOL_inviteout = NQD();
+	//if(createParty){
+	TSOL_AInviteSent = NQD();
 	for (IndexNum in arraySelfNames) {
 		//GL(IndexNum)
 		otherself = arraySelfNames[IndexNum];
@@ -111,11 +112,11 @@ function AutoInvite(){
 		//GL(otherself!=character.name);
 		//GL("checked for invite from " + otherself);
 		//for (otherself in arraySelfNamesE) {
-		if(otherself!=character.name){
+		if(otherself!=character.name && otherself!=""){
 			//GL("AutoInviting.."+otherself);
 			send_party_invite(otherself,0);
 			sentInvite = 1;
-			next_InviteOut = NQD(TTNA_AutoInviteWait,"s");
+			next_InviteOut = NQD(next_AutoInviteWait,"s");
 			//GL("NTSInvOut:"+next_InviteOut);
 			//GL(otherself+" invited");
 			//set_message("AutoInvite:"+otherself);
@@ -125,7 +126,7 @@ function AutoInvite(){
 		
 		
 	}; //for
-	}; //if
+	//}; //if
 	
 	
 	
@@ -135,25 +136,24 @@ function AutoInvite(){
 function AutoAcceptSelfInvite(){
 	//set_message("SearchInvites")
 	//GL(TSOL_InviteCheck<next_InviteCheck)
-	if(TSOL_InviteCheck<next_InviteCheck){set_message("AASI:TooSoon");return false}
+	if(TSOL_InviteCheck<next_InviteCheck){return false}
 	
 	for (IndexNum in arraySelfNames) {
 		otherself = arraySelfNames[IndexNum];
-		//GL("fndAAcpt:"+otherself);
-		//for (otherself in arraySelfNamesE) {
-		if(otherself!=character.name){
-			if(on_party_request(otherself)){
-				GL("autoinvite from:"+otherself);
+		if(otherself!=character.name && otherself!=""){
+		GL("srchAAcpt:"+otherself);
+		GL("srchAI:"+on_party_request(otherself))
+		
+			//if(on_party_request(otherself)){
+				//GL("autoinvite from:"+otherself);
 				//accept_party_request(otherself);
-				accept_party_invite(otherself)
-				parent.socket.emit('party', {event: 'raccept', name: otherself});
-				//accept_party_request(otherself);
-				//set_message("Auto"+otherself);
+				//var accepted = accept_party_invite(otherself)
+				accept_party_invite(otherself);
 				GL("Autoaccepted:"+otherself);
+				//parent.socket.emit('party', {event: 'accept', name: otherself});
 				
 				
-				
-			};
+			//};
 		};
 		
 	}
@@ -394,8 +394,9 @@ setInterval(function(){
 	set_message("GO!")
 	UseMPPot();
 	UseHPPot();
-	//AutoInvite();
-	AutoAcceptSelfInvite();
+	if(TSOL_InviteCheck>next_InviteOut){AutoInvite};
+	//if(TSOL_InviteCheck>=next_InviteCheck){AutoInvite()};
+	if(TSOL_InviteCheck>=next_InviteCheck){AutoAcceptSelfInvite()};
 	//GL(character.frequency)
 	if(character.ctype=="priest"){HealerMode()};
 	if(character.ctype=="warrior"){TankMode()};
