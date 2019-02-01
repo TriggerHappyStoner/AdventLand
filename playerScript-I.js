@@ -5,38 +5,51 @@
 
 //extra settings
 auto_reload(true)
+//on_party_invite("Logic")
 
-on_party_invite("Logic")
+//Vars Start
 
-arraySelfNamesE					= ["Logic", "Scriptkiddie", "Landstander", "", "", ""]
-arraySelfNamesP					= ["Boozn", "", ""]
+//Array
+arraySelfNamesE					= ["Logic", "Scriptkiddie", "Landstander", "EvilAlterBoy", "MerchantI", ""]
+arraySelfNamesP					= ["Boozn", ""]
+arraySelfNames 					= (arraySelfNamesE + "," + arraySelfNamesP).split(",")
+
+//Str
+next_HealTarget					= ""
+
+
+//DateTime
+//TSOL = TimeStampOfLast
 TSOL_InviteCheck				= 0
-lmtr_moveToRate					= 2000
-lmtr_InviteCheck				= 10
 TSOL_healspl					= 0
 TSOL_healhppot					= 0
 TSOL_healmppot					= 0
-sentInvite						= 0
-arraySelfNames 					= (arraySelfNamesE + "," + arraySelfNamesP).split(",")
-//var TSOL_inviteout					= New DateTime(0) + -1 * next_AutoInviteWait  --fails
-TSOL_AInviteSent				= 0
-TSOL_inviteout					= 0
-next_AutoInviteWait				= 1200
 next_InviteOut					= 0
 next_InviteCheck				= 0
-next_HealTarget					= ""
+TSOL_AInviteSent				= 0
+TSOL_inviteout					= 0
 
+//BOOLs
+sentInvite						= 0
+
+//Ints - Limits
+//lmtr = Limiter
+lmtr_AutoInviteWait				= 1200
+lmtr_moveToRate					= 2000
+lmtr_InviteCheck				= 10
+
+//Ints % - Trigger At %
 
 //above perc mana to heal friendlies outside party not in pvp
 trigger_MinMPtoHealNonPartyFriendlies 	= 0.73
 
-//perc life to trigger
 trigger_HPLow1                  = 0.60
 trigger_HPLow2                  = 0.50
 trigger_HPLow3                  = 0.40
 trigger_HPLow4                  = 0.30
 trigger_HPLow5                  = 0.20
 
+//Ints # - Trigger At #
 //amt from full
 trigger_HPLossAmt1               = 150
 trigger_HPLossAmt2               = 250
@@ -44,6 +57,8 @@ trigger_HPLossAmt3               = 350
 trigger_HPLossAmt4               = 450
 trigger_HPLossAmt5               = 550
 
+
+//Vars end
 
 function NQD(duration,type){
 	//year, month, day [, hour, minute, second, millisecond ]
@@ -99,7 +114,7 @@ function AutoInvite(){
 	//GL((TSOL_InviteCheck>next_InviteOut && TSOL_AInviteSent!=0) && sentInvite);
 	//GL(TSOL_InviteCheck>next_InviteOut && TSOL_AInviteSent!=0 && sentInvite);
 	//if(TSOL_AInviteSent!=0 && sentInvite){sentInvite=0; return sentInvite};    //fails
-	//if(TSOL_AInviteSent>=(New Date(0)+next_AutoInviteWait)){return sentInvite};
+	//if(TSOL_AInviteSent>=(New Date(0)+lmtr_AutoInviteWait)){return sentInvite};
 	//if(!character.party){createParty=1};
 	//GL(arraySelfNames)
 	//if(createParty){
@@ -116,7 +131,7 @@ function AutoInvite(){
 			//GL("AutoInviting.."+otherself);
 			send_party_invite(otherself,0);
 			sentInvite = 1;
-			next_InviteOut = NQD(next_AutoInviteWait,"s");
+			next_InviteOut = NQD(lmtr_AutoInviteWait,"s");
 			//GL("NTSInvOut:"+next_InviteOut);
 			//GL(otherself+" invited");
 			//set_message("AutoInvite:"+otherself);
