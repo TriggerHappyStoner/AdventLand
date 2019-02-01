@@ -374,9 +374,9 @@ function HealerMode() {
 	
 	var current = get_nearest_monster()
 	//var current = get_nearest_hostile()
-	//Spam taunt over 65% mana
-	GL(current.target)
-	if(character.mp/character.max_mp>=0.65 && can_use("taunt") && current.target!=character){GL("Cast:Taunt");CastSpell("taunt",current)};
+	//Spam taunt over 55% mana
+	//GL(current.target)
+	if(character.mp/character.max_mp>=0.55 && can_use("taunt") && current.target!=character.name){GL("Cast:Taunt");CastSpell("taunt",current); return};
 	
 	
 	
@@ -446,7 +446,7 @@ setInterval(function(){
 		attack(target);
 	}
 
-},650);
+},1000);
 
 // Learn Javascript: https://www.codecademy.com/learn/learn-javascript
 // Write your own CODE: https://github.com/kaansoral/adventureland
