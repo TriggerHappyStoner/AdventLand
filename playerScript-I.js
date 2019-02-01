@@ -372,10 +372,11 @@ function HealerMode() {
 
  function TankMode(){
 	
-	//var current = get_nearest_monster()
-	var current = get_nearest_hostile()
-	
-	if(can_use("taunt")){CastSpell("taunt",current)};
+	var current = get_nearest_monster()
+	//var current = get_nearest_hostile()
+	//Spam taunt over 65% mana
+	GL(current.target)
+	if(character.mp/character.max_mp>=0.65 && can_use("taunt") && current.target!=character){GL("Cast:Taunt");CastSpell("taunt",current)};
 	
 	
 	
