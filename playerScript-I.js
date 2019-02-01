@@ -1,7 +1,12 @@
 // Hey there!
 // This is CODE, lets you control your character with code.
 // If you don't know how to code, don't worry, It's easy.
-// Just set attack_mode to 1 and ENGAGE!
+// Just set god_mode to 1 and BELIEVE!
+
+//extra settings
+auto_reload(true)
+
+on_party_invite("Logic")
 
 arraySelfNamesE					= ["Logic", "Scriptkiddie", "Landstander", "", "", ""]
 arraySelfNamesP					= ["Boozn", "", ""]
@@ -20,6 +25,10 @@ next_InviteOut					= 0
 next_InviteCheck				= 0
 next_HealTarget					= ""
 
+
+//above perc mana to heal friendlies outside party not in pvp
+trigger_MinMPtoHealNonPartyFriendlies 	= 0.73
+
 //perc life to trigger
 trigger_HPLow1                  = 0.60
 trigger_HPLow2                  = 0.50
@@ -33,6 +42,7 @@ trigger_HPLossAmt2               = 250
 trigger_HPLossAmt3               = 350
 trigger_HPLossAmt4               = 450
 trigger_HPLossAmt5               = 550
+
 
 function NQD(duration,type){
 	//year, month, day [, hour, minute, second, millisecond ]
@@ -125,7 +135,7 @@ function AutoInvite(){
 function AutoAcceptSelfInvite(){
 	//set_message("SearchInvites")
 	//GL(TSOL_InviteCheck<next_InviteCheck)
-	if(TSOL_InviteCheck<next_InviteCheck){return false}
+	if(TSOL_InviteCheck<next_InviteCheck){set_message("AASI:TooSoon");return false}
 	
 	for (IndexNum in arraySelfNames) {
 		otherself = arraySelfNames[IndexNum];
@@ -133,8 +143,9 @@ function AutoAcceptSelfInvite(){
 		//for (otherself in arraySelfNamesE) {
 		if(otherself!=character.name){
 			if(on_party_request(otherself)){
-				//GL("autoinvite from:"+otherself);
+				GL("autoinvite from:"+otherself);
 				//accept_party_request(otherself);
+				accept_party_invite(otherself)
 				parent.socket.emit('party', {event: 'raccept', name: otherself});
 				//accept_party_request(otherself);
 				//set_message("Auto"+otherself);
@@ -359,6 +370,17 @@ function HealerMode() {
 	return
 }
 
+ function TankMode(){
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+ }
+
 
 var attack_mode=1
 //var followTargetname=""
@@ -370,10 +392,13 @@ var attack_mode=1
 setInterval(function(){
 	if(character.rip) return;
 	set_message("GO!")
+	UseMPPot();
+	UseHPPot();
 	//AutoInvite();
-	//AutoAcceptSelfInvite();
+	AutoAcceptSelfInvite();
 	//GL(character.frequency)
 	if(character.ctype=="priest"){HealerMode()};
+	if(character.ctype=="warrior"){TankMode()};
 	//GL("Class:"+character.ctype)
 	//use_hp_or_mp();
 	loot();
@@ -381,8 +406,6 @@ setInterval(function(){
 	
 	//if(!attack_mode || character.rip || is_moving(character)) return;
 	
-	UseHPPot();
-	UseMPPot();
 	
 	
 	if(is_moving(character)) return;
