@@ -7,38 +7,44 @@
 auto_reload(true)
 //on_party_invite("Logic")
 
-//Vars Start
+//////Vars Start//////
 
-//Array
+//////Array
 arraySelfNamesE					= ["Logic", "Scriptkiddie", "Landstander", "EvilAlterBoy", "MerchantI", ""]
 arraySelfNamesP					= ["Boozn", ""]
 arraySelfNames 					= (arraySelfNamesE + "," + arraySelfNamesP).split(",")
 
-//Str
+//////Str
 next_HealTarget					= ""
 
+//targ = Target
+targ_autoAttack					= ""
+targ_autoAssist					= ""
 
-//DateTime
+//
+
+
+//////DateTime
 //TSOL = TimeStampOfLast
 TSOL_InviteCheck				= 0
 TSOL_healspl					= 0
 TSOL_healhppot					= 0
 TSOL_healmppot					= 0
-next_InviteOut					= 0
-next_InviteCheck				= 0
 TSOL_AInviteSent				= 0
 TSOL_inviteout					= 0
+next_InviteOut					= 0
+next_InviteCheck				= 0
 
-//BOOLs
+//////BOOLs
 sentInvite						= 0
 
-//Ints - Limits
+//////Ints - Limits
 //lmtr = Limiter
 lmtr_AutoInviteWait				= 1200
 lmtr_moveToRate					= 2000
 lmtr_InviteCheck				= 10
 
-//Ints % - Trigger At %
+//////Ints % - Trigger At %
 
 //above perc mana to heal friendlies outside party not in pvp
 trigger_MinMPtoHealNonPartyFriendlies 	= 0.73
@@ -49,7 +55,7 @@ trigger_HPLow3                  = 0.40
 trigger_HPLow4                  = 0.30
 trigger_HPLow5                  = 0.20
 
-//Ints # - Trigger At #
+//////Ints # - Trigger At #
 //amt from full
 trigger_HPLossAmt1               = 150
 trigger_HPLossAmt2               = 250
@@ -58,7 +64,7 @@ trigger_HPLossAmt4               = 450
 trigger_HPLossAmt5               = 550
 
 
-//Vars end
+//////Vars end//////
 
 function NQD(duration,type){
 	//year, month, day [, hour, minute, second, millisecond ]
@@ -160,14 +166,8 @@ function AutoAcceptSelfInvite(){
 		//GL("srchAI:"+on_party_request(otherself))
 		
 			//if(on_party_request(otherself)){
-				//GL("autoinvite from:"+otherself);
-				//accept_party_request(otherself);
-				//var accepted = accept_party_invite(otherself)
 				accept_party_invite(otherself);
 				//GL("Autoaccepted:"+otherself);
-				//parent.socket.emit('party', {event: 'accept', name: otherself});
-				
-				
 			//};
 		};
 		
@@ -176,12 +176,20 @@ function AutoAcceptSelfInvite(){
 	TSOL_InviteCheck = NQD()
 }
 
-function gotoNearest(target,stopBeforeAmt){
-	return
+function gotoNearest_stopShort(target,stopBeforeAmt){
+	var current = target
+	
+	if(!current){
+		current = get_player(target)
+	}
+	
+	
+	
+	return 
 }
 
 
-function movetowards(target,stopBeforeAmt,stayBehind){
+function movetowards(target,stopBeforeAmt){
 	return
 	move(
 		character.x+(target.x-character.x-stopBeforeAmt),
@@ -199,7 +207,7 @@ function followTarget(target,followDistance,stayBehindBack){
 	
 	if(tarPlayer){
 		if(TSOL_moveTo>=lmtr_moveToRate+Date()){
-		movetowards(tarPlayer,3)
+		movetowards(tarPlayer,followDistance)
 		//move(tarPlayer)
 		//move(character.real_x+5,character.real_y)
 		TSOL_moveTo = Date()
@@ -404,7 +412,53 @@ var attack_mode=1
 //var followOtherSelfname=""
 //var gotoTargetname=""
 
+//
+function autoAttack(targ_autoAttack,forceSwitch){
+	var target=get_targeted_monster();
+	if(targ_autoAttack && forceSwitch){
+		target=targ_autoAttack
+	}
+	
+	//if(!target && !get_nearest_monster({target:Logic}))
+	if(!target)
+	{
+		target=get_nearest_monster({});
+		if(target) change_target(target);
+		else
+		{
+			set_message("No Monsters");
+			return "F_NM"
+		}
+	}
+	
+	if(!in_attack_range(target))
+	{
+		//move(
+		//	character.x+(target.x-character.x)/2,
+		//	character.y+(target.y-character.y)/2
+		//	);
+		// Walk half the distance
+	}
+	//else if(can_attack(target))
+	if(can_attack(target))
+	{
+		set_message("Attack:"+character.attack);
+		attack(target);
+	}
+	
+	
+	
+}
 
+function autoAssist(targ_autoAssist){
+	
+	
+	//followOtherSelfname = myOtherSelf();
+	//game_log(followOtherSelfname);
+	//followTarget(followOtherSelfname);
+	
+	
+}
 
 setInterval(function(){
 	if(character.rip) return;
@@ -427,40 +481,12 @@ setInterval(function(){
 	
 	
 	if(is_moving(character)) return;
-
-	//followOtherSelfname = myOtherSelf();
-	//game_log(followOtherSelfname);
-	//followTarget(followOtherSelfname);
+	autoAttack();
 	
-	var target=get_targeted_monster();
+	//GL(character.frequency)
 	
-	//if(!target && !get_nearest_monster({target:Logic}))
-	if(!target)
-	{
-		target=get_nearest_monster({});
-		if(target) change_target(target);
-		else
-		{
-			set_message("No Monsters");
-			return;
-		}
-	}
 	
-	if(!in_attack_range(target))
-	{
-		//move(
-		//	character.x+(target.x-character.x)/2,
-		//	character.y+(target.y-character.y)/2
-		//	);
-		// Walk half the distance
-	}
-	//else if(can_attack(target))
-	if(can_attack(target))
-	{
-		set_message("Attack:"+character.attack);
-		attack(target);
-	}
-
+	
 },1000);
 
 // Learn Javascript: https://www.codecademy.com/learn/learn-javascript
