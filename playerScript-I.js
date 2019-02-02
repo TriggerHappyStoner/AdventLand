@@ -5,6 +5,7 @@
 
 //extra settings
 auto_reload(true)
+
 //on_party_invite("Logic")
 
 //////Vars Start//////
@@ -12,7 +13,8 @@ auto_reload(true)
 //////Array
 arraySelfNamesE					= ["Logic", "Scriptkiddie", "Landstander", "EvilAlterBoy", "MerchantI", ""]
 arraySelfNamesP					= ["Boozn", ""]
-arraySelfNames 					= (arraySelfNamesE + "," + arraySelfNamesP).split(",")
+arraySelfNamesV					= ["Vaserati", ""]
+arraySelfNames 					= (arraySelfNamesE + "," + arraySelfNamesP + "," + arraySelfNamesV).replace(", \"\"","").split(",")
 
 //////Str
 next_HealTarget					= ""
@@ -88,13 +90,13 @@ function NQD(duration,type){
 	return newDate
 }
 
-function GRA(hp,max_hp){
+function get_RA(hp,max_hp){
 	remainder = max_hp - hp
 	
 	return remainder
 }
 
-function GRC(hp,max_hp){
+function get_RC(hp,max_hp){
 	remainder = max_hp - hp
 	
 	return remainder
@@ -459,8 +461,14 @@ function autoAssist(targ_autoAssist){
 	
 	
 }
+//TODO::
 
+//  bank_store(num, pack, pack_slot)
+
+//TODO END
 setInterval(function(){
+	performance_trick(); //thanks javascript
+	if(is_paused()){parent.pause()};
 	if(character.rip) return;
 	set_message("GO!")
 	UseMPPot();
