@@ -11,10 +11,11 @@ auto_reload(true)
 //////Vars Start//////
 
 //////Array
-arraySelfNamesE					= ["Logic", "Scriptkiddie", "Landstander", "EvilAlterBoy", "MerchantI", ""]
+arraySelfNamesE					= ["Logic", "Scriptkiddie", "Landstander", "EvilAltarBoy", "Indubitiable", ""]
 arraySelfNamesP					= ["Boozn", ""]
 arraySelfNamesV					= ["Vaserati", ""]
-arraySelfNames 					= (arraySelfNamesE + "," + arraySelfNamesP + "," + arraySelfNamesV).replace(", \"\"","").split(",")
+arraySelfNamesEE				= ["Exhaust", "Lethargy", "Existant"]
+arraySelfNames 					= (arraySelfNamesE + "," + arraySelfNamesP + "," + arraySelfNamesV + "," + arraySelfNamesEE).replace(", \"\"","").split(",")
 
 //////Str
 next_HealTarget					= ""
