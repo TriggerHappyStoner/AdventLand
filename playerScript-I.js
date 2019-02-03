@@ -120,9 +120,9 @@ function AutoInvite(){
 	//GL(new Date)
 	//createParty= 0;
 	//GL("AInvTS:"+TSOL_InviteCheck>next_InviteOut);
-	//GL((TSOL_InviteCheck>next_InviteOut && TSOL_AInviteSent!=0) && sentInvite);
-	//GL(TSOL_InviteCheck>next_InviteOut && TSOL_AInviteSent!=0 && sentInvite);
-	//if(TSOL_AInviteSent!=0 && sentInvite){sentInvite=0; return sentInvite};    //fails
+	//GL((TSOL_InviteCheck>next_InviteOut && TSOL_AInviteSent!==0) && sentInvite);
+	//GL(TSOL_InviteCheck>next_InviteOut && TSOL_AInviteSent!==0 && sentInvite);
+	//if(TSOL_AInviteSent!==0 && sentInvite){sentInvite=0; return sentInvite};    //fails
 	//if(TSOL_AInviteSent>=(New Date(0)+lmtr_AutoInviteWait)){return sentInvite};
 	//if(!character.party){createParty=1};
 	//GL(arraySelfNames)
@@ -133,10 +133,10 @@ function AutoInvite(){
 		otherself = arraySelfNames[IndexNum];
 		//GL("foundAInv:"+otherself);
 		
-		//GL(otherself!=character.name);
+		//GL(otherself!==character.name);
 		//GL("checked for invite from " + otherself);
 		//for (otherself in arraySelfNamesE) {
-		if(otherself!=character.name && otherself!=""){
+		if(otherself.name!==character.name && otherself!=""){
 			//GL("AutoInviting.."+otherself);
 			send_party_invite(otherself,0);
 			sentInvite = 1;
@@ -164,7 +164,7 @@ function AutoAcceptSelfInvite(){
 	
 	for (IndexNum in arraySelfNames) {
 		otherself = arraySelfNames[IndexNum];
-		if(otherself!=character.name && otherself!=""){
+		if(otherself.name!==character.name && otherself!=""){
 		//GL("srchAAcpt:"+otherself);
 		//GL("srchAI:"+on_party_request(otherself))
 		
@@ -343,6 +343,18 @@ function needsHeal(target,healamt){
 	return false
 }
 
+
+
+function inSameParty(player){
+	if(player.party && character.party && character.party === player.party){return true};
+	return false
+}
+
+
+
+
+
+
 function HealerMode() {
 	rangeamt = character.range
 	healamt = character.attack
@@ -358,7 +370,7 @@ function HealerMode() {
         //if (args.friendship && in_arr(current.owner, parent.friends)){continue};
         //if (args.exclude && in_arr(current.name, args.exclude)){continue}; // get_nearest_hostile({exclude:["Wizard"]}); Thanks
         
-		if (current.party && character.party == current.party){
+		if (inSameParty(current)){
 			 
 			//if(current.max_hp-current.hp>character.attack && next_HealTarget.hp){
 			//toHealList
@@ -406,19 +418,21 @@ function HealerMode() {
 	
 	var current = get_nearest_monster()
 	//var current = get_nearest_hostile()
-	//Spam taunt over 55% mana
+	//Spam taunt while over 55% mana
 	//GL(current.target)
 	if(
 		character.mp/character.max_mp>=0.55
 	&&  can_use("taunt")
-    &&  current.target!=character.name
+    &&  current.target!==character.name
+    &&  inSameParty(current)
     //&&  
-    //&&  
 		
 		
 		
-	){
-		//eventually taunts everyone?
+	) //endIf Conditions
+	
+	{ //start if routine
+		
 		GL("Cast:Taunt")
 		CastSpell("taunt",current)
 		
@@ -438,7 +452,6 @@ var attack_mode=1
 //var followOtherSelfname=""
 //var gotoTargetname=""
 
-//
 function autoAttack(targ_autoAttack,forceSwitch){
 	var target=get_targeted_monster();
 	if(targ_autoAttack && forceSwitch){
