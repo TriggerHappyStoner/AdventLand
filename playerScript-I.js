@@ -347,7 +347,7 @@ function needsHeal(target,healamt){
 
 
 function inSameParty(player){
-	if(player.party && character.party && character.party === player.party){return true};
+	if(character.party === player.party){return true};
 	return false
 }
 
@@ -396,7 +396,7 @@ function HealerMode() {
 			}  //if in range
 			//};
 			
-		}  //if inParty
+		}  //if inSameParty
 		current = ""
     }  //end for
 	
@@ -511,8 +511,9 @@ function autoAssist(targ_autoAssist){
 //TODO END
 
 
+// Main Looper
 setInterval(function(){
-	performance_trick(); //thanks javascript
+	//performance_trick(); //thanks javascript?
 	if(is_paused()){parent.pause()};
 	if(character.rip) return;
 	set_message("GO!")
@@ -520,7 +521,7 @@ setInterval(function(){
 	UseHPPot();
 	if(TSOL_InviteCheck>next_InviteOut){AutoInvite};
 	//if(TSOL_InviteCheck>=next_InviteCheck){AutoInvite()};
-	if(TSOL_InviteCheck>=next_InviteCheck){AutoAcceptSelfInvite()};
+	if(TSOL_InviteCheck>=next_InviteCheck && !character.party){AutoAcceptSelfInvite()};
 	//GL(character.frequency)
 	if(character.ctype=="priest"){HealerMode()};
 	if(character.ctype=="warrior"){TankMode()};
@@ -531,10 +532,21 @@ setInterval(function(){
 	
 	//if(!attack_mode || character.rip || is_moving(character)) return;
 	
+	// Potions are used from bot right to top left, items spawn in top left.
+	// #6 = Top right?
+	if(
+		item_properties(character.items[6])
+	&&  character.target
+	&&  inSameParty(character.target)
 	
+	){
+		send_item(character.target, 6, 1)
+		
+		
+	}; //endif send_item
 	
 	if(is_moving(character)) return;
-	autoAssist();
+	//autoAssist();
 	autoAttack();
 	
 	//GL(character.frequency)
