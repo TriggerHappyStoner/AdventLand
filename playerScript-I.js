@@ -40,7 +40,8 @@ next_InviteCheck				= 0
 //////BOOLs
 sentInvite						= 0
 
-//////Ints - Limits
+//////Ints
+amt_MP							= 300
 //lmtr = Limiter
 lmtr_AutoInviteWait				= 1200
 lmtr_moveToRate					= 2000
@@ -308,16 +309,22 @@ function UseMPPot() {
 	
 	if(can_heal(character)){
 		//force use if MP<10%
-		if(character.mp/character.max_mp<=0.10){
+		if(character.mp/character.max_mp<=0.25){
 			use('use_mp');
 			set_message("UsedMPPot");
-		}
+		};
+		
+		if(character.max_mp-character.mp>amt_MP){
+			use('use_mp');
+			set_message("UsedMPPot");
+			};
+		
+		if(character.max_mp-amt_MP>character.mp){
+			use('use_mp');
+			set_message("UsedMPPot");
+		};
+	};
 	
-		if(character.max_mp-550>character.mp){
-			use('use_mp');
-			set_message("UsedMPPot");
-		}
-	}
 	return 
 }
 
@@ -401,7 +408,24 @@ function HealerMode() {
 	//var current = get_nearest_hostile()
 	//Spam taunt over 55% mana
 	//GL(current.target)
-	if(character.mp/character.max_mp>=0.55 && can_use("taunt") && current.target!=character.name){GL("Cast:Taunt");CastSpell("taunt",current); return};
+	if(
+		character.mp/character.max_mp>=0.55
+	&&  can_use("taunt")
+    &&  current.target!=character.name
+    //&&  
+    //&&  
+		
+		
+		
+	){
+		//eventually taunts everyone?
+		GL("Cast:Taunt")
+		CastSpell("taunt",current)
+		
+		
+		return
+		
+	};
 	
 	
 	
@@ -435,6 +459,7 @@ function autoAttack(targ_autoAttack,forceSwitch){
 	
 	if(!in_attack_range(target))
 	{
+		target=get_nearest_monster({});
 		//move(
 		//	character.x+(target.x-character.x)/2,
 		//	character.y+(target.y-character.y)/2
@@ -461,11 +486,17 @@ function autoAssist(targ_autoAssist){
 	
 	
 }
+
+
 //TODO::
 
 //  bank_store(num, pack, pack_slot)
 
+
+
 //TODO END
+
+
 setInterval(function(){
 	performance_trick(); //thanks javascript
 	if(is_paused()){parent.pause()};
@@ -489,6 +520,7 @@ setInterval(function(){
 	
 	
 	if(is_moving(character)) return;
+	autoAssist();
 	autoAttack();
 	
 	//GL(character.frequency)
