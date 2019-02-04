@@ -380,9 +380,9 @@ function HealerMode() {
 			//GL(current.hp)
 			//GL(current.max_hp-current.hp>=healamt)
 			//GL(current.max_hp-current.hp<=healamt)
-
+			
 			if(parent.distance(character, current) <= rangeamt){
-			if(needsHeal(current,healamt)){
+			if(needsHeal(current,healamt) || current.hp/current.max_hp<=0.50){
 			if(next_HealTarget){
 				next_HealTarget = LeastLife(current,next_HealTarget)
 				//GL("CHT:"+next_HealTarget)
@@ -519,9 +519,9 @@ setInterval(function(){
 	set_message("GO!")
 	UseMPPot();
 	UseHPPot();
-	if(TSOL_InviteCheck>next_InviteOut){AutoInvite};
+	//if(TSOL_InviteCheck>next_InviteOut){AutoInvite};
 	//if(TSOL_InviteCheck>=next_InviteCheck){AutoInvite()};
-	if(TSOL_InviteCheck>=next_InviteCheck && !character.party){AutoAcceptSelfInvite()};
+	//if(TSOL_InviteCheck>=next_InviteCheck && !character.party){AutoAcceptSelfInvite()};
 	//GL(character.frequency)
 	if(character.ctype=="priest"){HealerMode()};
 	if(character.ctype=="warrior"){TankMode()};
@@ -536,11 +536,12 @@ setInterval(function(){
 	// #6 = Top right?
 	if(
 		item_properties(character.items[6])
-	&&  character.target
-	&&  inSameParty(character.target)
+	//&&  character.target
+	//&&  inSameParty(character.target)
 	
 	){
-		send_item(character.target, 6, 1)
+		send_item("Indubitiable", 6, 1)
+		//send_item(character.target, 6, 1)
 		
 		
 	}; //endif send_item
