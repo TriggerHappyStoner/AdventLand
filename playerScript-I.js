@@ -417,15 +417,17 @@ function HealerMode() {
 
  function TankMode(){
 	
-	var current = get_nearest_monster()
-	//var current = get_nearest_hostile()
+	if(!character.target){
+		closest = get_nearest_monster()
+		//current = get_nearest_hostile()
+	}
+	
 	//Spam taunt while over 55% mana
-	//GL(current.target)
 	if(
 		character.mp/character.max_mp>=0.55
 	&&  can_use("taunt")
-    &&  current.target!==character.name
-    &&  inSameParty(current)
+    &&  closest.target!==character.name
+    &&  inSameParty(get_target_of(closest))
     //&&  
 		
 		
@@ -433,18 +435,20 @@ function HealerMode() {
 	) //endIf Conditions
 	
 	{ //start if routine
-		
-		GL("Cast:Taunt")
-		CastSpell("taunt",current)
+		useTaunt = True
 		
 		
-		return
+		
 		
 	};
 	
+	if(useTaunt){
+		
+		GL("Cast:Taunt")
+		CastSpell("taunt",closest)
+	};
 	
-	
-	
+	return
  }
 
 
