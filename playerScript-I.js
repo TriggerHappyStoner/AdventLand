@@ -416,7 +416,7 @@ function HealerMode() {
 }
 
  function TankMode(){
-	
+	useTaunt = 0
 	if(!character.target){
 		closest = get_nearest_monster()
 		//current = get_nearest_hostile()
@@ -435,7 +435,7 @@ function HealerMode() {
 	) //endIf Conditions
 	
 	{ //start if routine
-		useTaunt = True
+		useTaunt = 1
 		
 		
 		
