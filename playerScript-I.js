@@ -534,17 +534,19 @@ setInterval(function(){
 	
 	// Potions are used from bot right to top left, items spawn in top left.
 	// #6 = Top right?
-	if(
-		item_properties(character.items[6])
+	if(item_properties(character.items[6]) && character.name === "Logic"){send_item("Indubitiable", 6, 1)};
+	if(item_properties(character.items[6]) && character.name === "Indubitiable"){send_item("Logic", 6, 1)};
+	//if(
+	//	item_properties(character.items[6])
 	//&&  character.target
 	//&&  inSameParty(character.target)
 	
-	){
-		send_item("Indubitiable", 6, 1)
+	//){
+	//	send_item("Indubitiable", 6, 1)
 		//send_item(character.target, 6, 1)
 		
 		
-	}; //endif send_item
+	//}; //endif send_item
 	
 	if(is_moving(character)) return;
 	//autoAssist();
