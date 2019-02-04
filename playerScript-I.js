@@ -53,6 +53,10 @@ lmtr_InviteCheck				= 10
 //above perc mana to heal friendlies outside party not in pvp
 trigger_MinMPtoHealNonPartyFriendlies 	= 0.73
 
+trigger_TeamHPLowPerc			= 0.60
+trigger_TeamHPHealNeededAmt		= 10000
+trigger_TeamHPatCritical		= 2
+
 trigger_HPLow1                  = 0.60
 trigger_HPLow2                  = 0.50
 trigger_HPLow3                  = 0.40
@@ -92,15 +96,17 @@ function NQD(duration,type){
 	return newDate
 }
 
-function get_RA(hp,max_hp){
-	remainder = max_hp - hp
-	
+function getCL(){
+	return character.level
+}
+
+function getRA(target){
+	remainder = target.max_hp - target.hp
 	return remainder
 }
 
-function get_RC(hp,max_hp){
-	remainder = max_hp - hp
-	
+function getRC(target){
+	remainder = 1 - target.hp/target.max_hp
 	return remainder
 }
 
@@ -151,7 +157,7 @@ function AutoInvite(){
 		
 		
 	}; //for
-	//}; //if
+	///}; //if
 	
 	
 	
@@ -166,13 +172,7 @@ function AutoAcceptSelfInvite(){
 	for (IndexNum in arraySelfNames) {
 		otherself = arraySelfNames[IndexNum];
 		if(otherself.name!==character.name && otherself!=""){
-		//GL("srchAAcpt:"+otherself);
-		//GL("srchAI:"+on_party_request(otherself))
-		
-			//if(on_party_request(otherself)){
 				accept_party_invite(otherself);
-				//GL("Autoaccepted:"+otherself);
-			//};
 		};
 		
 	}
@@ -180,21 +180,13 @@ function AutoAcceptSelfInvite(){
 	TSOL_InviteCheck = NQD()
 }
 
-function gotoNearest_stopShort(target,stopBeforeAmt){
-	var current = target
-	
-	if(!current){
-		current = get_player(target)
-	}
-	
-	
-	
-	return 
-}
-
-
 function movetowards(target,stopBeforeAmt){
-	return
+	if(target){
+		tarX = target.real_x
+		tarY = target.real_y
+		next_GotoCords = ""
+		
+	}
 	move(
 		character.x+(target.x-character.x-stopBeforeAmt),
 		character.y+(target.y-character.y-stopBeforeAmt)
@@ -344,17 +336,10 @@ function needsHeal(target,healamt){
 	return false
 }
 
-
-
 function inSameParty(player){
 	if(character.party === player.party){return true};
 	return false
 }
-
-
-
-
-
 
 function HealerMode() {
 	rangeamt = character.range
@@ -400,8 +385,6 @@ function HealerMode() {
 		current = ""
     }  //end for
 	
-	
-	
 	if(can_heal(next_HealTarget) && next_HealTarget){
 		//CastHeal(next_HealTarget)
 		heal(next_HealTarget)
@@ -415,7 +398,7 @@ function HealerMode() {
 	return
 }
 
- function TankMode(){
+function TankMode(){
 	useTaunt = 0
 	if(!character.target){
 		closest = get_nearest_monster()
@@ -429,25 +412,17 @@ function HealerMode() {
     &&  closest.target!==character.name
     &&  inSameParty(get_target_of(closest))
     //&&  
-		
-		
-		
 	) //endIf Conditions
 	
 	{ //start if routine
 		useTaunt = 1
 		
-		
-		
-		
 	};
 	
 	if(useTaunt){
-		
 		GL("Cast:Taunt")
 		CastSpell("taunt",closest)
 	};
-	
 	return
  }
 
@@ -491,24 +466,67 @@ function autoAttack(targ_autoAttack,forceSwitch){
 		attack(target);
 	}
 	
-	
-	
 }
 
-function autoAssist(targ_autoAssist){
+function HealerModeAoE(){
+	//rangeamt = character.range
+	//healamt = character.attack
+	if(getCL>=80){
+		aoeHealAmt = 800
+	}else if(getCL()>=72 && getCL<80){ //between lvls 72-80
+		aoeHealAmt = 720
+	}else if(getCL()>=60 && getCL<72){ //between lvls 60-72
+		aoeHealAmt = 600
+	}else if(getCL()>=40 && getCL<60){ //between lvls 40-60
+		aoeHealAmt = 500
+	}else{ //else or below lvl 40 (1-39)
+		aoeHealAmt = 400
+	};
 	
+	maxHPPool = 0
+	pplwithCritHP = 0
+	currentHPPool = character.hp
+	healsNeededAmt = 1
+	maxHealAmtppl = 1
+	
+	healsNeededAmt = healsNeededAmt + getRA(character)
+	
+	for (id in parent.entities) {
+        var current = parent.entities[id];
+        if (!inSameParty(current) || current.type != "character" || current.rip || current.invincible || current.npc) {continue};
+		
+		currentHPPool = currentHPPool + current.hp
+		maxHPPool = maxHPPool + current.max_hp
+		healsNeededAmt = healsNeededAmt + getRA(current)
+		if(getRC(current)>0.55){pplwithCritHP++};
+		maxHealAmtppl++
+		
+    }  //end for
+	
+	
+	maxHealAmt = aoeHealAmt * maxHealAmtppl
+	groupHPPerc = currentHPPool/maxHPPool
+	
+	
+	if(can_use("partyheal") && (groupHPPerc<=trigger_TeamHPLowPerc || pplwithCritHP>trigger_TeamHPatCritical || healsNeededAmt>=trigger_TeamHPHealNeededAmt)){
+		use("partyheal");
+		GL("PartyHeal!");
+	};
+	
+	return 
+}
+
+//TODO::
+
+//  bank_store(num, pack, pack_slot)
+
+function autoAssist(targ_autoAssist){
 	
 	//followOtherSelfname = myOtherSelf();
 	//game_log(followOtherSelfname);
 	//followTarget(followOtherSelfname);
 	
-	
 }
-
-
-//TODO::
-
-//  bank_store(num, pack, pack_slot)
 
 
 
@@ -518,9 +536,9 @@ function autoAssist(targ_autoAssist){
 // Main Looper
 setInterval(function(){
 	//performance_trick(); //thanks javascript?
-	if(is_paused()){parent.pause()};
+	//if(is_paused()){parent.pause()};
 	if(character.rip) return;
-	set_message("GO!")
+	set_message("GO!");
 	UseMPPot();
 	UseHPPot();
 	//if(TSOL_InviteCheck>next_InviteOut){AutoInvite};
@@ -536,31 +554,19 @@ setInterval(function(){
 	
 	//if(!attack_mode || character.rip || is_moving(character)) return;
 	
-	// Potions are used from bot right to top left, items spawn in top left.
+	// Potions are used from bot right to top left @ , items spawn in top left @ 0.
 	// #6 = Top right?
 	if(item_properties(character.items[6]) && character.name === "Logic"){send_item("Indubitiable", 6, 1)};
 	if(item_properties(character.items[6]) && character.name === "Indubitiable"){send_item("Logic", 6, 1)};
-	//if(
-	//	item_properties(character.items[6])
-	//&&  character.target
-	//&&  inSameParty(character.target)
-	
-	//){
-	//	send_item("Indubitiable", 6, 1)
-		//send_item(character.target, 6, 1)
-		
-		
-	//}; //endif send_item
-	
+
 	if(is_moving(character)) return;
 	//autoAssist();
 	autoAttack();
+	UseHPPot();
+	loot();
+	if(character.ctype=="priest"){HealerModeAoE()};
 	
-	//GL(character.frequency)
-	
-	
-	
-},1000);
+},800);
 
 // Learn Javascript: https://www.codecademy.com/learn/learn-javascript
 // Write your own CODE: https://github.com/kaansoral/adventureland
