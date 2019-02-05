@@ -15,16 +15,23 @@ arraySelfNamesE					= ["Logic", "Scriptkiddie", "Landstander", "EvilAltarBoy", "
 arraySelfNamesP					= ["Boozn", ""]
 arraySelfNamesV					= ["Vaserati", ""]
 arraySelfNamesEE				= ["Exhaust", "Lethargy", "Existant"]
-arraySelfNames 					= (arraySelfNamesE + "," + arraySelfNamesP + "," + arraySelfNamesV + "," + arraySelfNamesEE).replace(", \"\"","").split(",")
+arraySelfNames 					= (arraySelfNamesE + "," + arraySelfNamesP + "," + arraySelfNamesV + "," + arraySelfNamesEE).replace(", \"\"","").replace(",,",",").split(",")
+
+//arraySelfNames 					= (((arraySelfNamesE + "," + arraySelfNamesP + "," + arraySelfNamesV + "," + arraySelfNamesEE).replace(", \"\"","")).replace(",,",",")).split(",")
 
 //////Str
+//strArrSelfNames 				= ((arraySelfNamesE + "," + arraySelfNamesP + "," + arraySelfNamesV + "," + arraySelfNamesEE).replace(", \"\"","")).replace(",,",",")
+strArrSelfNames 				= (arraySelfNamesE + "," + arraySelfNamesP + "," + arraySelfNamesV + "," + arraySelfNamesEE).replace(", \"\"","").replace(",,",",")
+
 next_HealTarget					= ""
 
 //targ = Target
 targ_autoAttack					= ""
 targ_autoAssist					= ""
 
-//
+//targ_autoAssistNames			= ("target:'" & arraySelfNames.join("',target:'") & "'").replace(",target:''","")
+targ_autoAssistNames			= strArrSelfNames.replace(",,", ",").replace(",", ",target:")
+targ_autoAssistNamesFilter = autoAssistNamesFilter
 
 
 //////DateTime
@@ -39,19 +46,67 @@ next_InviteOut					= 0
 next_InviteCheck				= 0
 
 //////BOOLs
+god_mode						= 1
 sentInvite						= 0
 
 //////Ints
 amt_MP							= 300
+
+
+sendSlot_r1c1 = 00;
+sendSlot_r1c2 = 01;
+sendSlot_r1c3 = 02;
+sendSlot_r1c4 = 03;
+sendSlot_r1c5 = 04;
+sendSlot_r1c6 = 05;
+sendSlot_r1c7 = 06;
+sendSlot_r2c1 = 07;
+sendSlot_r2c2 = 08;
+sendSlot_r2c3 = 09;
+sendSlot_r2c4 = 10;
+sendSlot_r2c5 = 11;
+sendSlot_r2c6 = 12;
+sendSlot_r2c7 = 13;
+sendSlot_r3c1 = 14;
+sendSlot_r3c2 = 15;
+sendSlot_r3c3 = 16;
+sendSlot_r3c4 = 17;
+sendSlot_r3c5 = 18;
+sendSlot_r3c6 = 19;
+sendSlot_r3c7 = 20;
+sendSlot_r4c1 = 21;
+sendSlot_r4c2 = 22;
+sendSlot_r4c3 = 23;
+sendSlot_r4c4 = 24;
+sendSlot_r4c5 = 25;
+sendSlot_r4c6 = 26;
+sendSlot_r4c7 = 27;
+sendSlot_r5c1 = 28;
+sendSlot_r5c2 = 29;
+sendSlot_r5c3 = 30;
+sendSlot_r5c4 = 31;
+sendSlot_r5c5 = 32;
+sendSlot_r5c6 = 33;
+sendSlot_r5c7 = 34;
+sendSlot_r6c1 = 35;
+sendSlot_r6c2 = 36;
+sendSlot_r6c3 = 37;
+sendSlot_r6c4 = 38;
+sendSlot_r6c5 = 39;
+sendSlot_r6c6 = 40;
+sendSlot_r6c7 = 41;
+
 //lmtr = Limiter
 lmtr_AutoInviteWait				= 1200
 lmtr_moveToRate					= 2000
 lmtr_InviteCheck				= 10
+lmtr_SendGoldAboveAtLeast		= 10000
+lmtr_SendGoldAboveBase			= 25000
 
 //////Ints % - Trigger At %
 
 //above perc mana to heal friendlies outside party not in pvp
-trigger_MinMPtoHealNonPartyFriendlies 	= 0.73
+trigger_MinMPtoHealNonPartyFriendlies 	= 0.75
 
 trigger_TeamHPLowPerc			= 0.60
 trigger_TeamHPHealNeededAmt		= 10000
@@ -70,7 +125,6 @@ trigger_HPLossAmt2               = 250
 trigger_HPLossAmt3               = 350
 trigger_HPLossAmt4               = 450
 trigger_HPLossAmt5               = 550
-
 
 //////Vars end//////
 
@@ -211,25 +265,17 @@ function followTarget(target,followDistance,stayBehindBack){
 	};
 }
 
-
 function ismyOtherSelf(name){
-	var myOtherSelfis
-	
-	
-	//for (otherself in (arraySelfNamesE & arraySelfNamesP)) {
-	for (IndexNum in arraySelfNames) {
+	var myOtherSelf
+	for (IndexNum in arraySelfNamesE) {
 		otherself = arraySelfNames[IndexNum];
-	//for (otherself in [arraySelfNamesE, arraySelfNamesP]) {
-	//for (otherself in arraySelfNamesE) {
-		if(!otherself==character.name && !name==character.name){myOtherSelfis = 1};
-		if(otherself==name){myOtherSelfis=1};
-		
+		if(otherself!==character.name && name!==character.name){myOtherSelf = 0};
+		if(otherself===name){myOtherSelf=1};
 	}
-	
-	return myOtherSelfis
+	return myOtherSelf
 }
 
-function myOtherSelf(){
+function myOtherSelfsname(){
 	var myOtherSelfis = ""
 	var foundOtherSelf = 0
 	
@@ -398,6 +444,9 @@ function HealerMode() {
 	return
 }
 
+
+
+
 function TankMode(){
 	useTaunt = 0
 	if(!character.target){
@@ -468,7 +517,7 @@ function autoAttack(targ_autoAttack,forceSwitch){
 	
 }
 
-function HealerModeAoE(){
+function HealerModeAoE(){ //TODO
 	//rangeamt = character.range
 	//healamt = character.attack
 	if(getCL>=80){
@@ -507,7 +556,7 @@ function HealerModeAoE(){
 	maxHealAmt = aoeHealAmt * maxHealAmtppl
 	groupHPPerc = currentHPPool/maxHPPool
 	
-	
+	GL("needhp:"+healsNeededAmt+",curhp:"+currentHPPool+",maxhp:"+maxHPPool+",Grp%:"+groupHPPerc+",max:"+maxHealAmt)
 	if(can_use("partyheal") && (groupHPPerc<=trigger_TeamHPLowPerc || pplwithCritHP>trigger_TeamHPatCritical || healsNeededAmt>=trigger_TeamHPHealNeededAmt)){
 		use("partyheal");
 		GL("PartyHeal!");
@@ -528,26 +577,49 @@ function autoAssist(targ_autoAssist){
 	
 }
 
+function autoAssistNamesFilter(){
+	nameFilter=[];
+	for(indexNum in arraySelfNames){
+		wChar = arraySelfNames[indexNum];
+		if(wChar && wChar!==""){
+			pushInfo = [];
+			pushInfo.push({'target' : wChar});
+			GL(pushInfo);
+			nameFilter[indexNum].target = wChar;
+			nameFilter.push(pushInfo);
+			//nameFilter.push({'target':wChar});
+		};
+	}
+	return nameFilter
+}
 
 
-//TODO END
+//::TODO END
 
 
 // Main Looper
 setInterval(function(){
-	//performance_trick(); //thanks javascript?
+	//performance_trick(); //thanks javascript? browers only?
 	//if(is_paused()){parent.pause()};
 	if(character.rip) return;
-	set_message("GO!");
+	set_message("");
 	UseMPPot();
 	UseHPPot();
+	
+	//newTarg = get_nearest_monster({target:"Logic",target:"Boozn",target:"Indubitiable"});
+	//GL(targ_autoAssistNames);
+	//targ_autoAssistNamesFilter = autoAssistNamesFilter();
+	//GL(targ_autoAssistNamesFilter);
+	//newTarg = get_nearest_monster(targ_autoAssistNamesFilter);
+	//if(newTarg){GL("FoundMobAfter:"+newTarg.target)}
+	
 	//if(TSOL_InviteCheck>next_InviteOut){AutoInvite};
 	//if(TSOL_InviteCheck>=next_InviteCheck){AutoInvite()};
 	//if(TSOL_InviteCheck>=next_InviteCheck && !character.party){AutoAcceptSelfInvite()};
-	//GL(character.frequency)
+	//GL(character.frequency);
 	if(character.ctype=="priest"){HealerMode()};
 	if(character.ctype=="warrior"){TankMode()};
-	//GL("Class:"+character.ctype)
+	//GL("Class:"+character.ctype);
 	//use_hp_or_mp();
 	loot();
 	
@@ -556,9 +628,21 @@ setInterval(function(){
 	
 	// Potions are used from bot right to top left @ , items spawn in top left @ 0.
 	// #6 = Top right?
-	if(item_properties(character.items[6]) && character.name === "Logic"){send_item("Indubitiable", 6, 1)};
-	if(item_properties(character.items[6]) && character.name === "Indubitiable"){send_item("Logic", 6, 1)};
-
+	//if(character.gold>lmtr_SendGoldAboveBase){sendGoldAmt = lmtr_SendGoldAboveBase-character.gold};
+	//if(sendGoldAmt>=lmtr_SendGoldAboveAtLeast && character.name === "Logic"){send_gold(get_player("Indubitiable"), sendGoldAmt);GL("SentGold:"+sendGoldAmt)};
+	//if(character.name === "Logic"){
+		//send_gold("Indubitiable", sendGoldAmt);
+		//GL("SentGold:"+sendGoldAmt+get_player("Indubitiable"));
+		
+	//};
+	
+	//if(item_properties(character.items[sendSlot_r6c7]) && character.name === "Indubitiable"){send_item("Logic", sendSlot_r6c7, 100)};
+	if(item_properties(character.items[sendSlot_r6c7]) && ismyOtherSelf(character.name) && character.name!=="Logic"){send_item("Logic", sendSlot_r6c7, 1)};
+	if(item_properties(character.items[sendSlot_r6c7]) && character.name === "Logic"){send_item("Indubitiable", sendSlot_r6c7, 1)};
+	if(item_properties(character.items[sendSlot_r6c6]) && character.name === "Logic"){send_item("Boozn", sendSlot_r6c6, 1)};
+	if(item_properties(character.items[sendSlot_r6c6]) && character.name === "Boozn"){send_item("Indubitiable", sendSlot_r6c6, 1)};
+	if(item_properties(character.items[sendSlot_r6c7]) && character.name === "Boozn"){send_item("Logic", sendSlot_r6c7, 1)};
+	
 	if(is_moving(character)) return;
 	//autoAssist();
 	autoAttack();
