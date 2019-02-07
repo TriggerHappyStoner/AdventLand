@@ -50,7 +50,7 @@ god_mode						= 1
 sentInvite						= 0
 
 //////Ints
-amt_MP							= 300
+amt_MP							= 500
 
 
 sendSlot_r1c1 = 00;
@@ -120,11 +120,11 @@ trigger_HPLow5                  = 0.20
 
 //////Ints # - Trigger At #
 //amt from full
-trigger_HPLossAmt1               = 150
-trigger_HPLossAmt2               = 250
-trigger_HPLossAmt3               = 350
-trigger_HPLossAmt4               = 450
-trigger_HPLossAmt5               = 550
+trigger_HPLossAmt1               = 350
+trigger_HPLossAmt2               = 450
+trigger_HPLossAmt3               = 550
+trigger_HPLossAmt4               = 650
+trigger_HPLossAmt5               = 750
 
 //////Vars end//////
 
@@ -154,12 +154,33 @@ function getCL(){
 	return character.level
 }
 
-function getRA(target){
+function getMAmp(target){
+	remainder = target.max_mp - target.mp
+	return remainder
+}
+
+
+function getRCmp(target){
+	remainder = 1 - target.mp/target.max_mp
+	return remainder
+}
+
+function getCCmp(target){
+	remainder = target.mp/target.max_mp
+	return remainder
+}
+
+function getMAhp(target){
 	remainder = target.max_hp - target.hp
 	return remainder
 }
 
-function getRC(target){
+function getCChp(target){
+	remainder = target.hp/target.max_hp
+	return remainder
+}
+
+function getMChp(target){
 	remainder = 1 - target.hp/target.max_hp
 	return remainder
 }
@@ -173,7 +194,7 @@ function CastSpell(spell,target){
 }
 
 function CastHeal(target){
-	if(can_use("heal",target)){use_skill("heal",target)};
+	if(can_use("heal")){use_skill("heal",target)};
 }
 
 function AutoInvite(){
@@ -304,7 +325,7 @@ function myOtherSelfsname(){
 }
 
 function UseHPPot() {
-	if(can_heal(character)){
+	if(can_heal(character) && can_use("hppotion")){
 		//======== percent based healing ========
 		if(character.hp/character.max_hp<=trigger_HPLow5){  //20%
 			//use('use_hp');
@@ -317,25 +338,25 @@ function UseHPPot() {
 			//set_message("DrankHP!");
 		}else if(character.hp/character.max_hp<=trigger_HPLow2){  //50%
 			//use('use_hp');
-			heal(character)
+			//heal(character)
 			set_message("CastHeal!");
 		}else if(character.hp/character.max_hp<=trigger_HPLow1){  //60%
 			use('use_hp');
 			set_message("DrankHP!");
 		//======== start of amount based healing ========
-		}else if(character.max_hp-trigger_HPLossAmt5<=character.hp){  //550
+		}else if(character.max_hp-trigger_HPLossAmt5<=character.hp){  //750
 			//use('use_hp');
 			//set_message("DrankHP!");
-		}else if(character.max_hp-trigger_HPLossAmt4<=character.hp){  //450
+		}else if(character.max_hp-trigger_HPLossAmt4<=character.hp){  //650
 			//use('use_hp');
 			//set_message("DrankHP!");
-		}else if(character.max_hp-trigger_HPLossAmt3<=character.hp){  //350
+		}else if(character.max_hp-trigger_HPLossAmt3<=character.hp){  //550
 			//use('use_hp');
 			//set_message("DrankHP!");
-		}else if(character.max_hp-trigger_HPLossAmt2<=character.hp){  //250
+		}else if(character.max_hp-trigger_HPLossAmt2<=character.hp){  //450
 			//use('use_hp');
 			//set_message("DrankHP!");
-		}else if(character.max_hp-trigger_HPLossAmt1<=character.hp){  //150
+		}else if(character.max_hp-trigger_HPLossAmt1<=character.hp){  //350
 			use('use_hp');
 			set_message("DrankHP!");
 		}
@@ -346,7 +367,7 @@ function UseHPPot() {
 
 function UseMPPot() {
 	
-	if(can_heal(character)){
+	if(can_heal(character) && can_use("mppotion")){
 		//force use if MP<10%
 		if(character.mp/character.max_mp<=0.25){
 			use('use_mp');
@@ -387,6 +408,14 @@ function inSameParty(player){
 	return false
 }
 
+function HealerModeSelf() {
+	if(needsHeal(character,character.attack) && can_use("heal")){
+		
+		heal(character);
+		GL("Healed:Self");
+	};
+	return
+}
 function HealerMode() {
 	rangeamt = character.range
 	healamt = character.attack
@@ -443,9 +472,6 @@ function HealerMode() {
 	
 	return
 }
-
-
-
 
 function TankMode(){
 	useTaunt = 0
@@ -538,7 +564,7 @@ function HealerModeAoE(){ //TODO
 	healsNeededAmt = 1
 	maxHealAmtppl = 1
 	
-	healsNeededAmt = healsNeededAmt + getRA(character)
+	healsNeededAmt = healsNeededAmt + getMAhp(character)
 	
 	for (id in parent.entities) {
         var current = parent.entities[id];
@@ -546,8 +572,8 @@ function HealerModeAoE(){ //TODO
 		
 		currentHPPool = currentHPPool + current.hp
 		maxHPPool = maxHPPool + current.max_hp
-		healsNeededAmt = healsNeededAmt + getRA(current)
-		if(getRC(current)>0.55){pplwithCritHP++};
+		healsNeededAmt = healsNeededAmt + getMAhp(current)
+		if(getMChp(current)>0.55){pplwithCritHP++};
 		maxHealAmtppl++
 		
     }  //end for
@@ -556,8 +582,9 @@ function HealerModeAoE(){ //TODO
 	maxHealAmt = aoeHealAmt * maxHealAmtppl
 	groupHPPerc = currentHPPool/maxHPPool
 	
-	GL("needhp:"+healsNeededAmt+",curhp:"+currentHPPool+",maxhp:"+maxHPPool+",Grp%:"+groupHPPerc+",max:"+maxHealAmt)
-	if(can_use("partyheal") && (groupHPPerc<=trigger_TeamHPLowPerc || pplwithCritHP>trigger_TeamHPatCritical || healsNeededAmt>=trigger_TeamHPHealNeededAmt)){
+	//GL("needhp:"+healsNeededAmt+",curhp:"+currentHPPool+",maxhp:"+maxHPPool+",Grp%:"+groupHPPerc+",max:"+maxHealAmt)
+	if((groupHPPerc<=trigger_TeamHPLowPerc || pplwithCritHP>trigger_TeamHPatCritical || healsNeededAmt>=trigger_TeamHPHealNeededAmt)){
+	//if(can_use("partyheal") && (groupHPPerc<=trigger_TeamHPLowPerc || pplwithCritHP>trigger_TeamHPatCritical || healsNeededAmt>=trigger_TeamHPHealNeededAmt)){
 		use("partyheal");
 		GL("PartyHeal!");
 	};
@@ -569,11 +596,28 @@ function HealerModeAoE(){ //TODO
 
 //  bank_store(num, pack, pack_slot)
 
+function cast(spell, target){
+	if(can_use(spell) && target){use_skill(spell,target)}
+}
+
 function autoAssist(targ_autoAssist){
 	
 	//followOtherSelfname = myOtherSelf();
 	//game_log(followOtherSelfname);
 	//followTarget(followOtherSelfname);
+	
+}
+
+function EnergizeCaptain(){
+	captain = get_player("Logic")
+	if(captain && can_use("energize")){
+		//mpperc = getCCmp(captain)
+		//missingmp = getMAmp(captain)
+		//GL(mpperc &"__"& missingmp &"__"&captain.name)
+		//if(mpperc>=0.25 || missingmp>=800){
+			use_skill("energize",captain);
+		//}
+	}
 	
 }
 
@@ -604,6 +648,7 @@ setInterval(function(){
 	if(character.rip) return;
 	set_message("");
 	UseMPPot();
+	if(character.ctype=="priest"){HealerModeSelf()};
 	UseHPPot();
 	
 	//newTarg = get_nearest_monster({target:"Logic",target:"Boozn",target:"Indubitiable"});
@@ -617,7 +662,9 @@ setInterval(function(){
 	//if(TSOL_InviteCheck>=next_InviteCheck){AutoInvite()};
 	//if(TSOL_InviteCheck>=next_InviteCheck && !character.party){AutoAcceptSelfInvite()};
 	//GL(character.frequency);
+	if(character.ctype=="priest"){HealerModeAoE()};
 	if(character.ctype=="priest"){HealerMode()};
+	if(character.ctype=="mage"){EnergizeCaptain()};
 	if(character.ctype=="warrior"){TankMode()};
 	//GL("Class:"+character.ctype);
 	//use_hp_or_mp();
@@ -637,7 +684,7 @@ setInterval(function(){
 	//};
 	
 	//if(item_properties(character.items[sendSlot_r6c7]) && character.name === "Indubitiable"){send_item("Logic", sendSlot_r6c7, 100)};
-	if(item_properties(character.items[sendSlot_r6c7]) && ismyOtherSelf(character.name) && character.name!=="Logic"){send_item("Logic", sendSlot_r6c7, 1)};
+	if(item_properties(character.items[sendSlot_r6c7]) && character.name!=="Logic" && ismyOtherSelf(character.name)){send_item("Logic", sendSlot_r6c7, 1)};
 	if(item_properties(character.items[sendSlot_r6c7]) && character.name === "Logic"){send_item("Indubitiable", sendSlot_r6c7, 1)};
 	if(item_properties(character.items[sendSlot_r6c6]) && character.name === "Logic"){send_item("Boozn", sendSlot_r6c6, 1)};
 	if(item_properties(character.items[sendSlot_r6c6]) && character.name === "Boozn"){send_item("Indubitiable", sendSlot_r6c6, 1)};
@@ -648,7 +695,6 @@ setInterval(function(){
 	autoAttack();
 	UseHPPot();
 	loot();
-	if(character.ctype=="priest"){HealerModeAoE()};
 	
 },800);
 
