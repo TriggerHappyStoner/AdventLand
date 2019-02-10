@@ -684,11 +684,12 @@ setInterval(function(){
 	//};
 	
 	//if(item_properties(character.items[sendSlot_r6c7]) && character.name === "Indubitiable"){send_item("Logic", sendSlot_r6c7, 100)};
-	if(item_properties(character.items[sendSlot_r6c7]) && character.name!=="Logic" && ismyOtherSelf(character.name)){send_item("Logic", sendSlot_r6c7, 1)};
-	if(item_properties(character.items[sendSlot_r6c7]) && character.name === "Logic"){send_item("Indubitiable", sendSlot_r6c7, 1)};
-	if(item_properties(character.items[sendSlot_r6c6]) && character.name === "Logic"){send_item("Boozn", sendSlot_r6c6, 1)};
-	if(item_properties(character.items[sendSlot_r6c6]) && character.name === "Boozn"){send_item("Indubitiable", sendSlot_r6c6, 1)};
-	if(item_properties(character.items[sendSlot_r6c7]) && character.name === "Boozn"){send_item("Logic", sendSlot_r6c7, 1)};
+	//if(item_properties(character.items[sendSlot_r6c7]) && character.name!=="Logic" && ismyOtherSelf(character.name)){send_item("Logic", sendSlot_r6c7, 1)};
+	if(item_properties(character.items[sendSlot_r6c7]) && character.name !== "Potmiddleman"){send_item("Potmiddleman", sendSlot_r6c7, 1)};
+	//if(item_properties(character.items[sendSlot_r6c7]) && character.name === "Logic"){send_item("PotMiddleman", sendSlot_r6c7, 1)};
+	//if(item_properties(character.items[sendSlot_r6c6]) && character.name === "Logic"){send_item("Boozn", sendSlot_r6c6, 1)};
+	//if(item_properties(character.items[sendSlot_r6c6]) && character.name === "Boozn"){send_item("Indubitiable", sendSlot_r6c6, 1)};
+	//if(item_properties(character.items[sendSlot_r6c7]) && character.name === "Boozn"){send_item("Logic", sendSlot_r6c7, 1)};
 	
 	if(is_moving(character)) return;
 	//autoAssist();
