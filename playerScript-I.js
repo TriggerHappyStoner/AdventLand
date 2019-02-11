@@ -130,7 +130,7 @@ trigger_HPLossAmt5               = 750
 
 function NQD(duration,type){
 	//year, month, day [, hour, minute, second, millisecond ]
-	newDate = Date()
+	let newDate = Date()
 	if(type=="s"){
 		newDate = new Date() + Date(duration*1000)
 	}else if(type=="m"){
@@ -155,33 +155,38 @@ function getCL(){
 }
 
 function getMAmp(target){
-	remainder = target.max_mp - target.mp
+	if(!target){target = character};
+	let remainder = target.max_mp - target.mp
 	return remainder
 }
 
-
 function getRCmp(target){
-	remainder = 1 - target.mp/target.max_mp
+	if(!target){target = character};
+	let remainder = 1 - target.mp/target.max_mp
 	return remainder
 }
 
 function getCCmp(target){
-	remainder = target.mp/target.max_mp
+	if(!target){target = character};
+	let remainder = target.mp/target.max_mp
 	return remainder
 }
 
 function getMAhp(target){
-	remainder = target.max_hp - target.hp
+	if(!target){target = character};
+	let remainder = target.max_hp - target.hp
 	return remainder
 }
 
 function getCChp(target){
-	remainder = target.hp/target.max_hp
+	if(!target){target = character};
+	let remainder = target.hp/target.max_hp
 	return remainder
 }
 
 function getMChp(target){
-	remainder = 1 - target.hp/target.max_hp
+	if(!target){target = character};
+	let remainder = 1 - target.hp/target.max_hp
 	return remainder
 }
 
@@ -197,83 +202,93 @@ function CastHeal(target){
 	if(can_use("heal")){use_skill("heal",target)};
 }
 
-function AutoInvite(){
-	//sentInvite = 0;
-	//GL(new Date)
-	//createParty= 0;
-	//GL("AInvTS:"+TSOL_InviteCheck>next_InviteOut);
-	//GL((TSOL_InviteCheck>next_InviteOut && TSOL_AInviteSent!==0) && sentInvite);
-	//GL(TSOL_InviteCheck>next_InviteOut && TSOL_AInviteSent!==0 && sentInvite);
-	//if(TSOL_AInviteSent!==0 && sentInvite){sentInvite=0; return sentInvite};    //fails
-	//if(TSOL_AInviteSent>=(New Date(0)+lmtr_AutoInviteWait)){return sentInvite};
-	//if(!character.party){createParty=1};
-	//GL(arraySelfNames)
-	//if(createParty){
-	TSOL_AInviteSent = NQD();
-	for (IndexNum in arraySelfNames) {
-		//GL(IndexNum)
-		otherself = arraySelfNames[IndexNum];
-		//GL("foundAInv:"+otherself);
-		
-		//GL(otherself!==character.name);
-		//GL("checked for invite from " + otherself);
-		//for (otherself in arraySelfNamesE) {
-		if(otherself.name!==character.name && otherself!=""){
-			//GL("AutoInviting.."+otherself);
-			send_party_invite(otherself,0);
-			sentInvite = 1;
-			next_InviteOut = NQD(lmtr_AutoInviteWait,"s");
-			//GL("NTSInvOut:"+next_InviteOut);
-			//GL(otherself+" invited");
-			//set_message("AutoInvite:"+otherself);
-			//if(on_party_request(otherself)){accept_party_request(otherself)};
-			//if(on_party_request(otherself)){accept_party_request(otherself)};
-		};
-		
-		
-	}; //for
-	///}; //if
-	
-	
-	
-	return sentInvite
+function isCharType(target,chartype){
+	wTar = get_player(target)
+	if(wTar && chartype && wTar.ctype == chartype){
+		return 1
+	}
+	return 0
 }
 
-function AutoAcceptSelfInvite(){
-	//set_message("SearchInvites")
-	//GL(TSOL_InviteCheck<next_InviteCheck)
-	if(TSOL_InviteCheck<next_InviteCheck){return false}
-	
-	for (IndexNum in arraySelfNames) {
-		otherself = arraySelfNames[IndexNum];
-		if(otherself.name!==character.name && otherself!=""){
-				accept_party_invite(otherself);
-		};
+function partyManager(){
+	//function AutoInvite()
+	{
+		//sentInvite = 0;
+		//GL(new Date)
+		//createParty= 0;
+		//GL("AInvTS:"+TSOL_InviteCheck>next_InviteOut);
+		//GL((TSOL_InviteCheck>next_InviteOut && TSOL_AInviteSent!==0) && sentInvite);
+		//GL(TSOL_InviteCheck>next_InviteOut && TSOL_AInviteSent!==0 && sentInvite);
+		//if(TSOL_AInviteSent!==0 && sentInvite){sentInvite=0; return sentInvite};    //fails
+		//if(TSOL_AInviteSent>=(New Date(0)+lmtr_AutoInviteWait)){return sentInvite};
+		//if(!character.party){createParty=1};
+		//GL(arraySelfNames)
+		//if(createParty){
+		TSOL_AInviteSent = NQD();
+		for (IndexNum in arraySelfNames) {
+			//GL(IndexNum)
+			otherself = arraySelfNames[IndexNum];
+			//GL("foundAInv:"+otherself);
+			
+			//GL(otherself!==character.name);
+			//GL("checked for invite from " + otherself);
+			//for (otherself in arraySelfNamesE) {
+			if(otherself.name!==character.name && otherself!=""){
+				//GL("AutoInviting.."+otherself);
+				send_party_invite(otherself,0);
+				sentInvite = 1;
+				next_InviteOut = NQD(lmtr_AutoInviteWait,"s");
+				//GL("NTSInvOut:"+next_InviteOut);
+				//GL(otherself+" invited");
+				//set_message("AutoInvite:"+otherself);
+				//if(on_party_request(otherself)){accept_party_request(otherself)};
+				//if(on_party_request(otherself)){accept_party_request(otherself)};
+			};
+			
+			
+		}; //for
+		///}; //if
 		
+		
+		
+		return sentInvite
 	}
-	next_InviteCheck = NQD(lmtr_InviteCheck,"s")
-	TSOL_InviteCheck = NQD()
+
+	//function AutoAcceptSelfInvite()
+	{
+		//set_message("SearchInvites")
+		//GL(TSOL_InviteCheck<next_InviteCheck)
+		if(TSOL_InviteCheck<next_InviteCheck){return false}
+		
+		for (IndexNum in arraySelfNames) {
+			otherself = arraySelfNames[IndexNum];
+			if(otherself.name!==character.name && otherself!=""){
+					accept_party_invite(otherself);
+			};
+			
+		}
+		next_InviteCheck = NQD(lmtr_InviteCheck,"s")
+		TSOL_InviteCheck = NQD()
+	}
 }
 
 function movetowards(target,stopBeforeAmt){
+	if(!stopBeforeAmt || stopBeforeAmt<0){stopBeforeAmt=0};
 	if(target){
-		tarX = target.real_x
-		tarY = target.real_y
+		let tarX = target.real_x
+		let tarY = target.real_y
 		next_GotoCords = ""
-		
 	}
 	move(
 		character.x+(target.x-character.x-stopBeforeAmt),
 		character.y+(target.y-character.y-stopBeforeAmt)
 		);
-		
-			
 }
 
 function followTarget(target,followDistance,stayBehindBack){
 	return
-	tarPlayer = get_player(target)
-	tpAngle = tarPlayer.angle
+	let tarPlayer = get_player(target)
+	let tpAngle = tarPlayer.angle
 	
 	
 	if(tarPlayer){
@@ -287,7 +302,7 @@ function followTarget(target,followDistance,stayBehindBack){
 }
 
 function ismyOtherSelf(name){
-	var myOtherSelf
+	let myOtherSelf = 0;
 	for (IndexNum in arraySelfNamesE) {
 		otherself = arraySelfNames[IndexNum];
 		if(otherself!==character.name && name!==character.name){myOtherSelf = 0};
@@ -297,8 +312,8 @@ function ismyOtherSelf(name){
 }
 
 function myOtherSelfsname(){
-	var myOtherSelfis = ""
-	var foundOtherSelf = 0
+	let myOtherSelfis = ""
+	let foundOtherSelf = 0
 	
 	for (IndexNum in arraySelfNames) {
 		otherself = arraySelfNames[IndexNum];
@@ -327,23 +342,24 @@ function myOtherSelfsname(){
 function UseHPPot() {
 	if(can_heal(character) && can_use("hppotion")){
 		//======== percent based healing ========
-		if(character.hp/character.max_hp<=trigger_HPLow5){  //20%
+		if(getCChp()<=trigger_HPLow5){  //20%
 			//use('use_hp');
 			//set_message("DrankHP!");
-		}else if(character.hp/character.max_hp<=trigger_HPLow4){  //30%
+		}else if(getCChp()<=trigger_HPLow4){  //30%
 			//use('use_hp');
 			//set_message("DrankHP!");
-		}else if(character.hp/character.max_hp<=trigger_HPLow3){  //40%
+			
+		}else if(getCChp()<=trigger_HPLow3){  //40%
 			//use('use_hp');
 			//set_message("DrankHP!");
-		}else if(character.hp/character.max_hp<=trigger_HPLow2){  //50%
+		}else if(getCChp()<=trigger_HPLow2){  //50%
 			//use('use_hp');
 			//heal(character)
-			set_message("CastHeal!");
-		}else if(character.hp/character.max_hp<=trigger_HPLow1){  //60%
+			//set_message("CastHeal!");
+		}else if(getCChp()<=trigger_HPLow1){  //60%
 			use('use_hp');
 			set_message("DrankHP!");
-		//======== start of amount based healing ========
+		//======== amount based healing ========
 		}else if(character.max_hp-trigger_HPLossAmt5<=character.hp){  //750
 			//use('use_hp');
 			//set_message("DrankHP!");
@@ -374,15 +390,11 @@ function UseMPPot() {
 			set_message("UsedMPPot");
 		};
 		
-		if(character.max_mp-character.mp>amt_MP){
+		if(getMAmp(character)>amt_MP){
 			use('use_mp');
 			set_message("UsedMPPot");
 			};
 		
-		if(character.max_mp-amt_MP>character.mp){
-			use('use_mp');
-			set_message("UsedMPPot");
-		};
 	};
 	
 	return 
@@ -416,6 +428,7 @@ function HealerModeSelf() {
 	};
 	return
 }
+
 function HealerMode() {
 	rangeamt = character.range
 	healamt = character.attack
@@ -686,18 +699,21 @@ setInterval(function(){
 	//if(item_properties(character.items[sendSlot_r6c7]) && character.name === "Indubitiable"){send_item("Logic", sendSlot_r6c7, 100)};
 	//if(item_properties(character.items[sendSlot_r6c7]) && character.name!=="Logic" && ismyOtherSelf(character.name)){send_item("Logic", sendSlot_r6c7, 1)};
 	if(item_properties(character.items[sendSlot_r6c7]) && character.name !== "Potmiddleman"){send_item("Potmiddleman", sendSlot_r6c7, 1)};
-	//if(item_properties(character.items[sendSlot_r6c7]) && character.name === "Logic"){send_item("PotMiddleman", sendSlot_r6c7, 1)};
+	if(item_properties(character.items[sendSlot_r6c7]) && character.name !== "Potmiddleman"){send_item("Potmiddleman", sendSlot_r6c7, 100)};
+	if(item_properties(character.items[sendSlot_r6c7]) && character.name === "Potmiddleman"){send_item("Logic", sendSlot_r6c7, 1)};
+	if(item_properties(character.items[sendSlot_r6c7]) && character.name === "Potmiddleman"){send_item("Logic", sendSlot_r6c7, 100)};
 	//if(item_properties(character.items[sendSlot_r6c6]) && character.name === "Logic"){send_item("Boozn", sendSlot_r6c6, 1)};
 	//if(item_properties(character.items[sendSlot_r6c6]) && character.name === "Boozn"){send_item("Indubitiable", sendSlot_r6c6, 1)};
 	//if(item_properties(character.items[sendSlot_r6c7]) && character.name === "Boozn"){send_item("Logic", sendSlot_r6c7, 1)};
 	
-	if(is_moving(character)) return;
+	if(is_moving(character)){return};
 	//autoAssist();
 	autoAttack();
 	UseHPPot();
 	loot();
+	if(character.gold>1000000){send_gold("Potmiddleman",1000000)};
 	
-},800);
+},500);
 
 // Learn Javascript: https://www.codecademy.com/learn/learn-javascript
 // Write your own CODE: https://github.com/kaansoral/adventureland
