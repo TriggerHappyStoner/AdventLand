@@ -3,6 +3,9 @@
 // If you don't know how to code, don't worry, It's easy.
 // Just set god_mode to 1 and BELIEVE!
 
+// Potions are used from bot right to top left @ , items spawn in top left @ 0.
+
+
 //extra settings
 auto_reload(true)
 
@@ -24,6 +27,7 @@ arraySelfNames 					= (arraySelfNamesE + "," + arraySelfNamesP + "," + arraySelf
 strArrSelfNames 				= (arraySelfNamesE + "," + arraySelfNamesP + "," + arraySelfNamesV + "," + arraySelfNamesEE).replace(", \"\"","").replace(",,",",")
 
 next_HealTarget					= ""
+next_AttackTarget					= ""
 
 //targ = Target
 targ_autoAttack					= ""
@@ -456,7 +460,7 @@ function HealerMode(){
 	
 	for (id in parent.entities) {
         let current = parent.entities[id];
-        if (current.type != "character" || current.rip || current.invincible || current.npc || getMAhp(current)>0) {continue};
+        if (!current || current.type != "character" || current.rip || current.invincible || current.npc || getMAhp(current)==0) {continue};
 		if (inSameParty(current) || ismyOtherSelf(current)){
 			
 			if(parent.distance(character, current) <= rangeamt){
@@ -495,7 +499,7 @@ function HealerMode(){
 	
 	return 
 }
-
+//TODO low
 function TankMode(){
 	useTaunt = 0
 	if(!character.target){
@@ -523,37 +527,6 @@ function TankMode(){
 	};
 	return
  }
-
-function autoAttack(targ_autoAttack,forceSwitch){
-	//var target=get_targeted_monster();
-	target=get_nearest_monster({target:"Logic",target:"EvilAltarBoy",target:"Boozn",target:"Indubitiable",target:"Scriptkiddie",target:"Landstander"});
-		
-	if(targ_autoAttack && forceSwitch){
-		target=targ_autoAttack
-	}
-	
-	if(!target)
-	{
-		target=get_nearest_monster({target:"Logic",target:"EvilAltarBoy",target:"Boozn",target:"Indubitiable",target:"Scriptkiddie",target:"Landstander"});
-		if(target) change_target(target);
-	}
-	
-	if(!in_attack_range(target))
-	{
-		target=get_nearest_monster({});
-		//move(
-		//	character.x+(target.x-character.x)/2,
-		//	character.y+(target.y-character.y)/2
-		//	);
-		// Walk half the distance
-	}
-	if(can_attack(target))
-	{
-		set_message("Attack:"+character.attack);
-		attack(target);
-	}
-	
-}
 
 function HealerModeAoE(){
 	
@@ -652,7 +625,6 @@ function find_item(filter) {
   return [-1, null];
 }
 
-//  bank_store(num, pack, pack_slot)
 function offloaditems(){
 	if(tooSoon(next_offloaditems)){return};
 	offloadOtherChar = "Potmiddleman";
@@ -728,6 +700,46 @@ function cast(spell, target){
 	if(can_use(spell) && target){use(spell,target)}
 }
 
+function MergeMode(){
+	if(tooSoon(next_compounditems)){return};
+	compound_items();
+	next_compounditems = NQD(lmtr_compounditemsRate,"s");
+	
+}
+
+function autoAttack(targ_autoAttack,forceSwitch){
+	var ctarget = get_targeted_monster();
+	let wtarget = get_nearest_monster({target:"Logic",target:"Landstander",target:"Boozn",target:"Indubitiable",target:"Scriptkiddie",target:"EvilAltarBoy"})
+	
+	if(targ_autoAttack && forceSwitch){
+		wtarget=targ_autoAttack
+	}
+	
+	if(!wtarget)
+	{
+		//wtarget=get_nearest_monster({target:"Logic",target:"EvilAltarBoy",target:"Boozn",target:"Indubitiable",target:"Scriptkiddie",target:"Landstander"});
+		wtarget=get_nearest_monster();
+		//if(wtarget){change_target(wtarget)}
+		//if(wtarget){next_AttackTarget = wtarget)}
+	}
+	
+	if(!in_attack_range(wtarget))
+	{
+		wtarget=get_nearest_monster();
+	//	move(
+	//		character.x+(wtarget.x-character.x)/2,
+	//		character.y+(wtarget.y-character.y)/2
+	//		);
+	//	// Walk half the distance
+	}
+	next_AttackTarget = wtarget
+	if(can_attack(next_AttackTarget))
+	{
+		set_message("Attack:"+character.attack);
+		attack(next_AttackTarget);
+	}
+	
+}
 
 function autoAssist(targ_autoAssist){
 	
@@ -754,13 +766,6 @@ function autoAssistNamesFilter(){
 }
 
 
-function MergeMode(){
-	if(tooSoon(next_compounditems)){return};
-	compound_items();
-	next_compounditems = NQD(lmtr_compounditemsRate,"s");
-	
-}
-
 //::TODO END
 
 
@@ -768,50 +773,32 @@ function MergeMode(){
 setInterval(function(){
 	//performance_trick(); //thanks javascript? browers only?
 	//if(is_paused()){parent.pause()};
-	if(character.rip) return;
-	set_message("");
-	UseMPPot();
-	if(character.ctype=="priest"){HealerModeSelf()};
-	UseHPPot();
+	if(character.rip || !god_mode){return}
+	set_message("")
+	UseMPPot()
+	if(character.ctype=="priest"){HealerModeSelf()}
+	UseHPPot()
 	
-	//newTarg = get_nearest_monster({target:"Logic",target:"Boozn",target:"Indubitiable"});
-	//GL(targ_autoAssistNames);
-	//targ_autoAssistNamesFilter = autoAssistNamesFilter();
-	//GL(targ_autoAssistNamesFilter);
-	//newTarg = get_nearest_monster(targ_autoAssistNamesFilter);
-	//if(newTarg){GL("FoundMobAfter:"+newTarg.target)}
+	if(character.ctype=="priest"){HealerMode()}
+	if(character.ctype=="mage"){EnergizeCaptain()}
+	if(character.ctype=="warrior"){TankMode()}
+	if(character.ctype=="merchant"){MergeMode()}
 	
-	//if(TSOL_InviteCheck>next_InviteOut){AutoInvite};
-	//if(TSOL_InviteCheck>=next_InviteCheck){AutoInvite()};
-	//if(TSOL_InviteCheck>=next_InviteCheck && !character.party){AutoAcceptSelfInvite()};
-	//GL(character.frequency);
-	if(character.ctype=="priest"){HealerMode()};
-	if(character.ctype=="mage"){EnergizeCaptain()};
-	if(character.ctype=="warrior"){TankMode()};
-	if(character.ctype=="merchant"){MergeMode()};
-	//GL("Class:"+character.ctype);
-	//use_hp_or_mp();
+	
 	loot();
-	
+	offloaditems();
 	
 	//if(!attack_mode || character.rip || is_moving(character)) return;
 	
-	// Potions are used from bot right to top left @ , items spawn in top left @ 0.
-	// #6 = Top right?
-	if(character.name!="Potmiddleman" && character.gold>lmtr_SendGoldAboveAtLeast){send_gold("Potmiddleman",(character.gold-lmtr_SendGoldAboveBase))};
+	
+	if(character.ctype=="priest"){HealerModeAoE()}
 	
 	if(is_moving(character)){return};
 	//autoAssist();
 	autoAttack();
 	UseHPPot();
-	loot();
-	offloaditems();
 	//partyManager();
-	if(character.ctype=="priest"){HealerModeAoE() ;HealerMode()};
+	
+	
+	if(character.name!="Potmiddleman" && character.gold>lmtr_SendGoldAboveAtLeast){send_gold("Potmiddleman",(character.gold-lmtr_SendGoldAboveBase))};
 },500);
-
-// Learn Javascript: https://www.codecademy.com/learn/learn-javascript
-// Write your own CODE: https://github.com/kaansoral/adventureland
-// NOTE: If the tab isn't focused, browsers slow down the game
-// NOTE: Use the performance_trick() function as a workaround
-
