@@ -786,7 +786,7 @@ setInterval(function(){
 	
 	
 	loot();
-	offloaditems();
+	if(get_player("Potmiddleman")){offloaditems()}
 	
 	//if(!attack_mode || character.rip || is_moving(character)) return;
 	
@@ -800,5 +800,5 @@ setInterval(function(){
 	//partyManager();
 	
 	
-	if(character.name!="Potmiddleman" && character.gold>lmtr_SendGoldAboveAtLeast){send_gold("Potmiddleman",(character.gold-lmtr_SendGoldAboveBase))};
+	if(get_player("Potmiddleman") && character.name!="Potmiddleman" && character.gold>lmtr_SendGoldAboveAtLeast){send_gold("Potmiddleman",(character.gold-lmtr_SendGoldAboveBase))};
 },500);
