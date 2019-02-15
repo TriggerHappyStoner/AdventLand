@@ -72,7 +72,7 @@ lmtr_SendGoldAboveAtLeast		= 500000
 lmtr_SendGoldAboveBase			= 250000
 lmtr_offloaditemsRate			= 100
 lmtr_compounditemsRate			= 45
-lmtr_tradepostitemsRate			= 280
+lmtr_tradepostitemsRate			= 15
 lmtr_HealAoERate				= 4
 MainLooperRate					= 450
 
@@ -716,20 +716,20 @@ function MergeMode(){
 function TradeMode(){
 	
 	if(tooSoon(next_TradePostItems)){return};
-	GL("Posting Items...");
+	//GL("Posting Items...");
+	for(i in tradeSlotList){
+	if(character.slots[tradeSlotList[i]]){continue};
 	for(cinv = 0; cinv < 6; cinv++){
 		
-	for(i in tradeSlotList){
-		if(character.slots[tradeSlotList[i]]){continue};
 		wItem = character.items[cinv];
-		if(wItem && filterItemsTradeMode(wItem)){
+		if(wItem && filterItemsTradeMode(wItem) && !character.slots[tradeSlotList[i]]){
 			tslot = tradeSlotList[i];
 			trade(cinv,tslot,perPrice,quant);
 			break;
 		}
 	}
 	}
-	GL("Posted Items.")
+	//GL("Posted Items.")
 	
 	
 	next_TradePostItems = NQD(lmtr_tradepostitemsRate,"s");
