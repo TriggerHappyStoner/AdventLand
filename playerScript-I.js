@@ -19,6 +19,7 @@ arraySelfNamesP					= ["Boozn", ""]
 arraySelfNamesV					= ["Vaserati", ""]
 arraySelfNamesEE				= ["Exhaust", "Lethargy", "Existant"]
 arraySelfNames 					= (arraySelfNamesE + "," + arraySelfNamesP + "," + arraySelfNamesV + "," + arraySelfNamesEE).replace(", \"\"","").replace(",,",",").split(",")
+tradeSlotList 					= ["trade1", "trade2", "trade3", "trade4", "trade5", "trade6", "trade7", "trade8", "trade9", "trade10", "trade11", "trade12", "trade13", "trade14", "trade15", "trade16"]
 
 //arraySelfNames 					= (((arraySelfNamesE + "," + arraySelfNamesP + "," + arraySelfNamesV + "," + arraySelfNamesEE).replace(", \"\"","")).replace(",,",",")).split(",")
 
@@ -27,7 +28,7 @@ arraySelfNames 					= (arraySelfNamesE + "," + arraySelfNamesP + "," + arraySelf
 strArrSelfNames 				= (arraySelfNamesE + "," + arraySelfNamesP + "," + arraySelfNamesV + "," + arraySelfNamesEE).replace(", \"\"","").replace(",,",",")
 
 next_HealTarget					= ""
-next_AttackTarget					= ""
+next_AttackTarget				= ""
 
 //targ = Target
 targ_autoAttack					= ""
@@ -53,6 +54,7 @@ next_InviteCheck				= 0
 next_offloaditems				= 0
 next_compounditems				= 0
 next_HealAoEtime				= 0
+next_TradePostItems				= 0
 
 
 //////BOOLs
@@ -63,14 +65,16 @@ sentInvite						= 0
 amt_MP							= 500
 
 //lmtr = Limiter
-lmtr_AutoInviteWait				= 1200
-lmtr_moveToRate					= 2000
-lmtr_InviteCheck				= 10
+lmtr_AutoInviteWait				= 100
+lmtr_moveToRate					= 2
+lmtr_InviteCheck				= 100
 lmtr_SendGoldAboveAtLeast		= 500000
 lmtr_SendGoldAboveBase			= 250000
 lmtr_offloaditemsRate			= 100
-lmtr_compounditemsRate			= 10
+lmtr_compounditemsRate			= 45
+lmtr_tradepostitemsRate			= 280
 lmtr_HealAoERate				= 4
+MainLooperRate					= 450
 
 
 //////Ints % - Trigger At %
@@ -148,6 +152,8 @@ var maxLevel = 3;
 
 //////Vars end//////
 
+
+////// Extra Functions
 function NQD(duration,type){
 	// Date(year, month, day [, hour, minute, second, millisecond ])
 	if(duration<1){duration=1};
@@ -222,6 +228,18 @@ function GL(message){
 	game_log(message)
 }
 
+function isCharType(target,chartype){
+	wTar = get_player(target)
+	if(wTar && chartype && wTar.ctype == chartype){
+		return 1
+	}
+	return 0
+}
+
+////// End Extra Functions
+
+////// Other Functions
+
 function CastSpell(spell,target){
 	if(can_use(spell,target)){use_skill(spell,target)};
 }
@@ -230,71 +248,59 @@ function CastHeal(target){
 	if(can_use("heal")){use_skill("heal",target)};
 }
 
-function isCharType(target,chartype){
-	wTar = get_player(target)
-	if(wTar && chartype && wTar.ctype == chartype){
-		return 1
-	}
-	return 0
-}
+
+////// End Other Functions
+
+
 // TODO:
 
 function partyManager(leader){
-	//function AutoInvite()
-	{
-		if(!character.party && character.name===leader){createParty=1};
-		//sentInvite = 0;
-		//GL(new Date)
-		//createParty= 0;
-		//GL("AInvTS:"+TSOL_InviteCheck>next_InviteOut);
-		//GL((TSOL_InviteCheck>next_InviteOut && TSOL_AInviteSent!==0) && sentInvite);
-		//GL(TSOL_InviteCheck>next_InviteOut && TSOL_AInviteSent!==0 && sentInvite);
-		if(tooSoon(next_InviteOut)){return};
-		//if(TSOL_AInviteSent!==0 && sentInvite){sentInvite=0; return sentInvite};    //fails
-		//if(TSOL_AInviteSent>=(New Date(0)+lmtr_AutoInviteWait)){return sentInvite};
-		//
-		//GL(arraySelfNames)
-		//if(createParty){
-		TSOL_AInviteSent = NQD();
-		for (IndexNum in arraySelfNames) {
-			//GL(IndexNum)
-			otherself = arraySelfNames[IndexNum];
-			//GL("foundAInv:"+otherself);
-			
-			//GL(otherself!==character.name);
-			//GL("checked for invite from " + otherself);
-			//for (otherself in arraySelfNamesE) {
-			if(otherself.name!==character.name && otherself!=""){
-				//GL("AutoInviting.."+otherself);
-				send_party_invite(otherself,0);
-				sentInvite = 1;
-				next_InviteOut = NQD(lmtr_AutoInviteWait,"s");
-				//GL("NTSInvOut:"+next_InviteOut);
-				//GL(otherself+" invited");
-				//set_message("AutoInvite:"+otherself);
-				//if(on_party_request(otherself)){accept_party_request(otherself)};
-				//if(on_party_request(otherself)){accept_party_request(otherself)};
-			};
-		}; //for
-		///}; //if
-		return sentInvite
-	}
-	//function AutoAcceptSelfInvite()
-	{
-		//set_message("SearchInvites")
-		//GL(TSOL_InviteCheck<next_InviteCheck)
-		if(TSOL_InviteCheck<next_InviteCheck){return false}
+	GL(on_party_request("EvilAltarBoy"));
+	if(tooSoon(next_InviteOut)){return};
+	next_InviteOut = NQD(lmtr_AutoInviteWait,"s");
+	if(!character.party && character.name===leader){createParty = 1};
+
+	for (IndexNum in arraySelfNames) {
+		otherself = arraySelfNames[IndexNum];
+		//GL(on_party_request(otherself));
+		invitee = get_player(otherself);
+		if(!invitee || invitee.party==character.party || otherself.name===character.name || otherself!=""){continue};
+		if(invitee && !invitee.party){send_party_invite(otherself,0);};
+		if(invitee && invitee.party){send_party_invite(otherself,1);};
+		//if(){
+			GL(on_party_request(otherself));
+			send_party_invite(otherself,0);
+			next_InviteOut = NQD(lmtr_AutoInviteWait,"s");
+			//GL("NTSInvOut:"+next_InviteOut);
+			//GL(otherself+" invited");
+			//set_message("AutoInvite:"+otherself);
+			//if(on_party_request(otherself)){accept_party_request(otherself)};
+		//};
+	}; //for
 		
-		for (IndexNum in arraySelfNames) {
-			otherself = arraySelfNames[IndexNum];
-			if(otherself.name!==character.name && otherself!=""){
-					accept_party_invite(otherself);
-			};
-			
-		}
-		next_InviteCheck = NQD(lmtr_InviteCheck,"s")
-		TSOL_InviteCheck = NQD()
-	}
+		TSOL_AInviteSent = NQD();
+		
+		return
+		
+	//function AutoAcceptSelfInvite()
+	//{
+	//	//set_message("SearchInvites")
+	//	//GL(TSOL_InviteCheck<next_InviteCheck)
+	//	if(TSOL_InviteCheck<next_InviteCheck){return false}
+	//	
+	//	for (IndexNum in arraySelfNames) {
+	//		otherself = arraySelfNames[IndexNum];
+	//		if(otherself.name!==character.name && otherself!=""){
+	//				accept_party_invite(otherself);
+	//		};
+	//		
+	//	}
+	//	
+	//	next_InviteCheck = NQD(lmtr_InviteCheck,"s")
+	//	TSOL_InviteCheck = NQD()
+	//}
+	
+	
 }
 
 function movetowards(target,stopBeforeAmt){
@@ -707,36 +713,74 @@ function MergeMode(){
 	
 }
 
+function TradeMode(){
+	
+	if(tooSoon(next_TradePostItems)){return};
+	GL("Posting Items...");
+	for(cinv = 0; cinv < 6; cinv++){
+		
+	for(i in tradeSlotList){
+		if(character.slots[tradeSlotList[i]]){continue};
+		wItem = character.items[cinv];
+		if(wItem && filterItemsTradeMode(wItem)){
+			tslot = tradeSlotList[i];
+			trade(cinv,tslot,perPrice,quant);
+			break;
+		}
+	}
+	}
+	GL("Posted Items.")
+	
+	
+	next_TradePostItems = NQD(lmtr_tradepostitemsRate,"s");
+}
+
+function filterItemsTradeMode(wItem){
+	quant = 1;
+	switch(wItem.name){
+		case "stand0":
+		case "candypop":
+			return false;
+		case "mpot0":
+		case "hpot0":
+			perPrice = 10;
+			quant = 1000;
+			break;
+		case "mpot1":
+			perPrice = 50;
+			quant = 1000;
+			break;
+			
+	}
+	return true
+}
+
 function autoAttack(targ_autoAttack,forceSwitch){
 	var ctarget = get_targeted_monster();
-	let wtarget = get_nearest_monster({target:"Logic",target:"Landstander",target:"Boozn",target:"Indubitiable",target:"Scriptkiddie",target:"EvilAltarBoy"})
+	let target = get_nearest_monster({target:"Logic",target:"Landstander",target:"Boozn",target:"Indubitiable",target:"Scriptkiddie",target:"EvilAltarBoy"})
 	
 	if(targ_autoAttack && forceSwitch){
-		wtarget=targ_autoAttack
+		target=targ_autoAttack;
+		if(can_attack(target))
+		{
+			set_message("Attack:"+character.attack);
+			attack(target);
+		}
 	}
 	
-	if(!wtarget)
+	if(!target)
 	{
-		//wtarget=get_nearest_monster({target:"Logic",target:"EvilAltarBoy",target:"Boozn",target:"Indubitiable",target:"Scriptkiddie",target:"Landstander"});
-		wtarget=get_nearest_monster();
-		//if(wtarget){change_target(wtarget)}
-		//if(wtarget){next_AttackTarget = wtarget)}
+		//target=get_nearest_monster({target:"Logic",target:"EvilAltarBoy",target:"Boozn",target:"Indubitiable",target:"Scriptkiddie",target:"Landstander"});
+		target=get_nearest_monster();
+		//if(target){change_target(target)}
 	}
 	
-	if(!in_attack_range(wtarget))
-	{
-		wtarget=get_nearest_monster();
-	//	move(
-	//		character.x+(wtarget.x-character.x)/2,
-	//		character.y+(wtarget.y-character.y)/2
-	//		);
-	//	// Walk half the distance
-	}
-	next_AttackTarget = wtarget
-	if(can_attack(next_AttackTarget))
+	if(!in_attack_range(target)){target=get_nearest_monster()}
+
+	if(can_attack(target))
 	{
 		set_message("Attack:"+character.attack);
-		attack(next_AttackTarget);
+		attack(target);
 	}
 	
 }
@@ -768,37 +812,46 @@ function autoAssistNamesFilter(){
 
 //::TODO END
 
-
+setInterval(MainLooper,MainLooperRate);
 // Main Looper
-setInterval(function(){
+function MainLooper(){
 	//performance_trick(); //thanks javascript? browers only?
-	//if(is_paused()){parent.pause()};
+	//if(is_paused()){pause()};
+	
+	if(character.ctype=="merchant"){MergeMode(); TradeMode(); pause(); return};
+	
+	pause();
 	if(character.rip || !god_mode){return}
-	set_message("")
-	UseMPPot()
-	if(character.ctype=="priest"){HealerModeSelf()}
-	UseHPPot()
+	set_message("");
+	UseMPPot();
+	if(character.ctype=="priest"){HealerModeSelf()};
+	UseHPPot();
 	
-	if(character.ctype=="priest"){HealerMode()}
-	if(character.ctype=="mage"){EnergizeCaptain()}
-	if(character.ctype=="warrior"){TankMode()}
-	if(character.ctype=="merchant"){MergeMode()}
+	if(is_moving(character)){if(is_paused()){pause();};return};
 	
+	if(!character.slots.elixir){use(41)};
+	
+	if(character.ctype=="priest"){HealerMode()};
+	if(character.ctype=="mage"){EnergizeCaptain()};
+	if(character.ctype=="warrior"){TankMode()};
 	
 	loot();
-	if(get_player("Potmiddleman")){offloaditems()}
+	if(get_player("Potmiddleman")){offloaditems()};
 	
 	//if(!attack_mode || character.rip || is_moving(character)) return;
 	
 	
-	if(character.ctype=="priest"){HealerModeAoE()}
+	if(character.ctype=="priest"){HealerModeAoE()};
 	
-	if(is_moving(character)){return};
+	
 	//autoAssist();
 	autoAttack();
 	UseHPPot();
+	//partyManager("Logic");
 	//partyManager();
 	
 	
 	if(get_player("Potmiddleman") && character.name!="Potmiddleman" && character.gold>lmtr_SendGoldAboveAtLeast){send_gold("Potmiddleman",(character.gold-lmtr_SendGoldAboveBase))};
-},500);
+	//if(is_paused()){pause()};
+	
+}
