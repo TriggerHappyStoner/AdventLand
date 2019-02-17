@@ -33,11 +33,16 @@ next_AttackTarget				= ""
 //targ = Target
 targ_autoAttack					= ""
 targ_autoAssist					= ""
+last_Buffed						= ""
+
 
 //targ_autoAssistNames			= ("target:'" & arraySelfNames.join("',target:'") & "'").replace(",target:''","")
 targ_autoAssistNames			= strArrSelfNames.replace(",,", ",").replace(",", ",target:")
-targ_autoAssistNamesFilter = autoAssistNamesFilter
+targ_autoAssistNamesFilter 		= autoAssistNamesFilter
 
+
+//TradeMode
+lastSolditemname				= ""
 
 //////DateTime
 //TSOL = TimeStampOfLast
@@ -63,6 +68,7 @@ sentInvite						= 0
 
 //////Ints
 amt_MP							= 500
+quant							= 1000
 
 //lmtr = Limiter
 lmtr_AutoInviteWait				= 100
@@ -71,8 +77,8 @@ lmtr_InviteCheck				= 100
 lmtr_SendGoldAboveAtLeast		= 500000
 lmtr_SendGoldAboveBase			= 250000
 lmtr_offloaditemsRate			= 100
-lmtr_compounditemsRate			= 45
-lmtr_tradepostitemsRate			= 15
+lmtr_compounditemsRate			= 5
+lmtr_tradepostitemsRate			= 3
 lmtr_HealAoERate				= 4
 MainLooperRate					= 450
 
@@ -176,6 +182,10 @@ function NQD(duration,type){
 
 function tooSoon(wTime){
 	return (wTime && wTime>=NQD())
+}
+
+function tooFar(target,rangeamnt){
+	return (target && parent.distance(character, target) > rangeamnt)
 }
 
 function getCL(){
@@ -459,6 +469,30 @@ function EnergizeCaptain(){
 	
 }
 
+function MerchantBuffMode(){
+	
+	//use("mluck",character);
+	rangeamt = character.range;
+	for (id in parent.entities) {
+        let current = parent.entities[id];
+        if (!current || current.type != "character" || current.rip || current.invincible || current.npc || tooFar(current,320) || !can_use("mluck") || current.name===last_Buffed) {continue};
+		GL(current.slots["elixir"]);
+		if (inSameParty(current) || ismyOtherSelf(current)){
+			GL("BuffFriend:"+current.name);
+			use("mluck",current);
+			last_Buffed += current.name;
+			continue;
+		}
+		
+		GL("BuffFriendly:"+current.name);
+		use("mluck",current);
+		
+	}
+	
+	
+	
+}
+
 function HealerMode(){
 	rangeamt = character.range
 	healamt = character.attack
@@ -710,34 +744,59 @@ function MergeMode(){
 	if(tooSoon(next_compounditems)){return};
 	compound_items();
 	next_compounditems = NQD(lmtr_compounditemsRate,"s");
-	
+}
+
+function TradeSlotsFull(){
+	let fullTradeSlots = 0;
+	for(i in tradeSlotList){
+		if(character.slots[tradeSlotList[i]]){fullTradeSlots += 1};
+	}
+	if(fullTradeSlots==16){return true};
+	return false
 }
 
 function TradeMode(){
+	if(tooSoon(next_TradePostItems) || TradeSlotsFull()){return};
+	GL(NQD());
 	
-	if(tooSoon(next_TradePostItems)){return};
-	//GL("Posting Items...");
+	if(character.gold>(20*3000)){buy("hpot0",3000);};
+	if(character.gold>(20*3000)){buy("mpot0",3000);};
+	
+	for(cinv = 14; cinv >= 0; cinv--){
+	let wTItem = character.items[cinv];
+	if(!wTItem || !filterItemsTradeMode(wTItem)){continue};
 	for(i in tradeSlotList){
-	if(character.slots[tradeSlotList[i]]){continue};
-	for(cinv = 0; cinv < 6; cinv++){
-		
-		wItem = character.items[cinv];
-		if(wItem && filterItemsTradeMode(wItem) && !character.slots[tradeSlotList[i]]){
-			tslot = tradeSlotList[i];
-			trade(cinv,tslot,perPrice,quant);
-			break;
-		}
+		if(character.slots[tradeSlotList[i]]){continue};
+		let wTItemcnt = character.items[cinv].q;
+		if(quant>wTItemcnt){break};
+		let tslot = tradeSlotList[i];
+		setTimeout(trade(cinv,tslot,perPrice,quant),100);
+		GL(cinv+"="+wTItemcnt+"->"+tslot);
+		lastSolditemname = wTItem.name;
+		if(wTItemcnt<=1000){break};
 	}
+		//buy(wTItem.name,quant);
+	
 	}
 	//GL("Posted Items.")
 	
+	if(character.gold>(20*quant)){
+		if(lastSolditemname==""){
+			//buy("hpot0",quant);
+			//buy("mpot0",quant);
+		}else if(lastSolditemname=="hpot0"){
+			//buy("hpot0",quant);
+		}else if(lastSolditemname=="mpot0"){
+			//buy("mpot0",quant);
+		}
+	}
 	
 	next_TradePostItems = NQD(lmtr_tradepostitemsRate,"s");
 }
 
-function filterItemsTradeMode(wItem){
+function filterItemsTradeMode(wTItem){
 	quant = 1;
-	switch(wItem.name){
+	switch(wTItem.name){
 		case "stand0":
 		case "candypop":
 			return false;
@@ -745,14 +804,17 @@ function filterItemsTradeMode(wItem){
 		case "hpot0":
 			perPrice = 10;
 			quant = 1000;
-			break;
+			return true
+			//break;
 		case "mpot1":
-			perPrice = 50;
+		case "hpot1":
+			perPrice = 55;
 			quant = 1000;
-			break;
+			return true
+			//break;
 			
 	}
-	return true
+	return false
 }
 
 function autoAttack(targ_autoAttack,forceSwitch){
@@ -818,15 +880,23 @@ function MainLooper(){
 	//performance_trick(); //thanks javascript? browers only?
 	//if(is_paused()){pause()};
 	
-	if(character.ctype=="merchant"){MergeMode(); TradeMode(); pause(); return};
+	if(character.ctype=="merchant"){
+		setInterval(MerchantBuffMode(), 250);
+		setInterval(MergeMode(), lmtr_compounditemsRate);
+		setInterval(TradeMode(), lmtr_tradepostitemsRate);
+		pause();
+		
+		};
 	
 	pause();
 	if(character.rip || !god_mode){return}
 	set_message("");
+	
 	UseMPPot();
 	if(character.ctype=="priest"){HealerModeSelf()};
 	UseHPPot();
 	
+	if(character.ctype=="merchant"){return};
 	if(is_moving(character)){if(is_paused()){pause();};return};
 	
 	if(!character.slots.elixir){use(41)};
