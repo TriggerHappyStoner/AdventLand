@@ -457,13 +457,17 @@ function EnergizeCaptain(){
 	}
 	if(captain){
 		use_skill("energize",captain);
+	}else if(!captain){
+		use_skill("energize","Boozn");
+		targ_nextEnergize="Boozn"
+		
 	}
 	
 	if(targ_nextEnergize===""){
 		use_skill("energize","Logic");
 		targ_nextEnergize="Boozn"
 	}
-	
+	if(!captain){return};
 	if(captain.name=="Logic" || targ_nextEnergize===""){targ_nextEnergize="Boozn"};
 	if(captain.name=="Boozn"){targ_nextEnergize="Logic"};
 }
@@ -604,7 +608,7 @@ function HealerModeAoE(){
 	maxHealAmt = aoeHealAmt * maxHealAmtppl
 	groupHPPerc = (currentHPPool/maxHPPool).toFixed(2) * 100
 	
-	GL("HP -"+healsNeededAmt+": "+currentHPPool+" / "+maxHPPool+"( "+maxHealAmt+"):"+groupHPPerc+"% "+(groupHPPerc<=trigger_HealAoETeamHPLowPerc));
+	GL("HP -"+healsNeededAmt+" : "+currentHPPool+" / "+maxHPPool+" ("+maxHealAmt+") : "+groupHPPerc+"%");
 	if(groupHPPerc<=trigger_HealAoETeamHPLowPerc || pplwithCritHP>trigger_HealAoETeamHPCntatCritical || healsNeededAmt>=trigger_HealAoETeamHPHealNeededAmt){
 	//if(can_use("partyheal") && (groupHPPerc<=trigger_HealAoETeamHPLowPerc || pplwithCritHP>trigger_HealAoETeamHPCntatCritical || healsNeededAmt>=trigger_HealAoETeamHPHealNeededAmt)){
 		use("partyheal");
