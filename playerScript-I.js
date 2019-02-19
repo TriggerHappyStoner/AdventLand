@@ -7,9 +7,9 @@
 
 
 //extra settings
-auto_reload(true)
+auto_reload(true);
 
-//on_party_invite("Logic")
+//on_party_invite("Logic");
 
 //////Vars Start//////
 
@@ -18,14 +18,14 @@ arraySelfNamesE					= ["Logic", "Scriptkiddie", "Landstander", "EvilAltarBoy", "
 arraySelfNamesP					= ["Boozn", ""]
 arraySelfNamesV					= ["Vaserati", ""]
 arraySelfNamesEE				= ["Exhaust", "Lethargy", "Existant"]
-arraySelfNames 					= (arraySelfNamesE + "," + arraySelfNamesP + "," + arraySelfNamesV + "," + arraySelfNamesEE).replace(", \"\"","").replace(",,",",").split(",")
+arraySelfNames 					= (arraySelfNamesE + "," + arraySelfNamesP + "," + arraySelfNamesV + "," + arraySelfNamesEE).replace(", \"\"","").replace(",,",",").split(",");
 tradeSlotList 					= ["trade1", "trade2", "trade3", "trade4", "trade5", "trade6", "trade7", "trade8", "trade9", "trade10", "trade11", "trade12", "trade13", "trade14", "trade15", "trade16"]
 
-//arraySelfNames 					= (((arraySelfNamesE + "," + arraySelfNamesP + "," + arraySelfNamesV + "," + arraySelfNamesEE).replace(", \"\"","")).replace(",,",",")).split(",")
+//arraySelfNames 					= (((arraySelfNamesE + "," + arraySelfNamesP + "," + arraySelfNamesV + "," + arraySelfNamesEE).replace(", \"\"","")).replace(",,",",")).split(",");
 
 //////Str
-//strArrSelfNames 				= ((arraySelfNamesE + "," + arraySelfNamesP + "," + arraySelfNamesV + "," + arraySelfNamesEE).replace(", \"\"","")).replace(",,",",")
-strArrSelfNames 				= (arraySelfNamesE + "," + arraySelfNamesP + "," + arraySelfNamesV + "," + arraySelfNamesEE).replace(", \"\"","").replace(",,",",")
+//strArrSelfNames 				= ((arraySelfNamesE + "," + arraySelfNamesP + "," + arraySelfNamesV + "," + arraySelfNamesEE).replace(", \"\"","")).replace(",,",",");
+strArrSelfNames 				= (arraySelfNamesE + "," + arraySelfNamesP + "," + arraySelfNamesV + "," + arraySelfNamesEE).replace(", \"\"","").replace(",,",",");
 
 next_HealTarget					= ""
 next_AttackTarget				= ""
@@ -33,11 +33,12 @@ next_AttackTarget				= ""
 //targ = Target
 targ_autoAttack					= ""
 targ_autoAssist					= ""
+targ_nextEnergize				= ""
 last_Buffed						= ""
 
 
-//targ_autoAssistNames			= ("target:'" & arraySelfNames.join("',target:'") & "'").replace(",target:''","")
-targ_autoAssistNames			= strArrSelfNames.replace(",,", ",").replace(",", ",target:")
+//targ_autoAssistNames			= ("target:'" & arraySelfNames.join("',target:'") & "'").replace(",target:''","");
+targ_autoAssistNames			= strArrSelfNames.replace(",,", ",").replace(",", ",target:");
 targ_autoAssistNamesFilter 		= autoAssistNamesFilter
 
 
@@ -88,13 +89,13 @@ MainLooperRate					= 450
 //above perc mana to heal friendlies outside party not in pvp
 trigger_MinMPtoHealNonPartyFriendlies 	= 0.75
 
-trigger_HealAoETeamHPLowPerc			= 0.60
+trigger_HealAoETeamHPLowPerc			= 85
 trigger_HealAoETeamHPHealNeededAmt		= 1600
 trigger_HealAoETeamHPCntatCritical		= 3
 
 trigger_HPLow1                  = 0.60
 trigger_HPLow2                  = 0.50
-trigger_HPLow3                  = 0.40
+trigger_HPLow3                  = 0.45
 trigger_HPLow4                  = 0.30
 trigger_HPLow5                  = 0.20
 
@@ -152,7 +153,17 @@ citems_r6c7 = 41;
 
 
 ////// extras
-var whitelist = ['wbook0', 'intamulet', 'stramulet', 'dexamulet', 'intearring', 'strearring', 'dexearring', 'hpbelt', 'hpamulet', 'ringsj', 'amuletofm', 'orbofstr', 'orbofint', 'orbofres', 'orbofhp'];
+//var compounditemsList = ['wbook0', 'intamulet', 'stramulet', 'dexamulet', 'intearring', 'strearring', 'dexearring', 'hpbelt', 'hpamulet', 'ringsj', 'amuletofm', 'orbofstr', 'orbofint', 'orbofres', 'orbofhp'];
+var compounditemsList = [
+	'wbook0', 		'ringsj', 		'amuletofm', 	'orbofres', 	'orbofsc', 
+	'dexamulet', 	'intamulet', 	'hpamulet', 	'stramulet',
+	'dexbelt', 		'intbelt', 		'hpbelt', 		'strbelt',
+	'dexearring', 	'intearring', 	'vitearring', 	'strearring',
+	'dexring', 		'intring', 		'vitring', 		'strring',
+					'orbofint', 	'orbofhp', 		'orbofstr'
+	];
+baughtScroll = [0, 0]
+
 var use_better_scrolls = false; //240,000 Gold Scroll = true [only will use for +2 and higher], 6,400 Gold Scroll = false [will only use base scroll no matter what]
 var maxLevel = 3;
 
@@ -161,7 +172,7 @@ var maxLevel = 3;
 
 ////// Extra Functions
 function NQD(duration,type){
-	// Date(year, month, day [, hour, minute, second, millisecond ])
+	// Date(year, month, day [, hour, minute, second, millisecond ]);
 	if(duration<1){duration=1};
 	if(type=="s"){
 		newDate = new Date() * 1 + (duration*1000) //+#secs
@@ -181,11 +192,11 @@ function NQD(duration,type){
 }
 
 function tooSoon(wTime){
-	return (wTime && wTime>=NQD())
+	return (wTime && wTime>=NQD());
 }
 
 function tooFar(target,rangeamnt){
-	return (target && parent.distance(character, target) > rangeamnt)
+	return (!target || parent.distance(character, target) > rangeamnt);
 }
 
 function getCL(){
@@ -235,11 +246,11 @@ function getMChp(target){
 }
 
 function GL(message){
-	game_log(message)
+	game_log(message);
 }
 
 function isCharType(target,chartype){
-	wTar = get_player(target)
+	wTar = get_player(target);
 	if(wTar && chartype && wTar.ctype == chartype){
 		return 1
 	}
@@ -265,12 +276,12 @@ function CastHeal(target){
 // TODO:
 
 function partyManager(leader){
-	GL(on_party_request("EvilAltarBoy"));
+	//GL(on_party_request("EvilAltarBoy"));
 	if(tooSoon(next_InviteOut)){return};
 	next_InviteOut = NQD(lmtr_AutoInviteWait,"s");
 	if(!character.party && character.name===leader){createParty = 1};
 
-	for (IndexNum in arraySelfNames) {
+	for (IndexNum in arraySelfNames){
 		otherself = arraySelfNames[IndexNum];
 		//GL(on_party_request(otherself));
 		invitee = get_player(otherself);
@@ -278,7 +289,7 @@ function partyManager(leader){
 		if(invitee && !invitee.party){send_party_invite(otherself,0);};
 		if(invitee && invitee.party){send_party_invite(otherself,1);};
 		//if(){
-			GL(on_party_request(otherself));
+			//GL(on_party_request(otherself));
 			send_party_invite(otherself,0);
 			next_InviteOut = NQD(lmtr_AutoInviteWait,"s");
 			//GL("NTSInvOut:"+next_InviteOut);
@@ -292,13 +303,13 @@ function partyManager(leader){
 		
 		return
 		
-	//function AutoAcceptSelfInvite()
+	//function AutoAcceptSelfInvite();
 	//{
-	//	//set_message("SearchInvites")
-	//	//GL(TSOL_InviteCheck<next_InviteCheck)
+	//	//set_message("SearchInvites");
+	//	//GL(TSOL_InviteCheck<next_InviteCheck);
 	//	if(TSOL_InviteCheck<next_InviteCheck){return false}
 	//	
-	//	for (IndexNum in arraySelfNames) {
+	//	for (IndexNum in arraySelfNames){
 	//		otherself = arraySelfNames[IndexNum];
 	//		if(otherself.name!==character.name && otherself!=""){
 	//				accept_party_invite(otherself);
@@ -306,8 +317,8 @@ function partyManager(leader){
 	//		
 	//	}
 	//	
-	//	next_InviteCheck = NQD(lmtr_InviteCheck,"s")
-	//	TSOL_InviteCheck = NQD()
+	//	next_InviteCheck = NQD(lmtr_InviteCheck,"s");
+	//	TSOL_InviteCheck = NQD();
 	//}
 	
 	
@@ -328,21 +339,21 @@ function movetowards(target,stopBeforeAmt){
 
 function followTarget(target,followDistance,stayBehindBack){
 	return
-	let tarPlayer = get_player(target)
+	let tarPlayer = get_player(target);
 	let tpAngle = tarPlayer.angle
 	if(tarPlayer){
 		if(TSOL_moveTo>=lmtr_moveToRate+Date()){
-		movetowards(tarPlayer,followDistance)
-		//move(tarPlayer)
-		//move(character.real_x+5,character.real_y)
-		TSOL_moveTo = Date()
+		movetowards(tarPlayer,followDistance);
+		//move(tarPlayer);
+		//move(character.real_x+5,character.real_y);
+		TSOL_moveTo = Date();
 		};
 	};
 }
 
 function ismyOtherSelf(wTarg){
 	if(!wTarg){return 0};
-	for (IndexNum in arraySelfNames) {
+	for (IndexNum in arraySelfNames){
 		otherself = arraySelfNames[IndexNum];
 		if(otherself===wTarg.name){return 1};
 	}
@@ -352,13 +363,13 @@ function ismyOtherSelf(wTarg){
 function myOtherSelfsname(){
 	let myOtherSelfis = ""
 	let foundOtherSelf = 0
-	for (IndexNum in arraySelfNames) {
+	for (IndexNum in arraySelfNames){
 		otherself = arraySelfNames[IndexNum];
-	//for (otherself in [arraySelfNamesE, arraySelfNamesP]) {
-	//for (otherself in arraySelfNamesE) {
+	//for (otherself in [arraySelfNamesE, arraySelfNamesP]){
+	//for (otherself in arraySelfNamesE){
 		if(!otherself==character.name ){
 			
-			myOtherSelfis = get_player(otherself)
+			myOtherSelfis = get_player(otherself);
 			if(myOtherSelfis){foundOtherSelf = 1; return myOtherSelfis};
 			
 		};
@@ -366,69 +377,47 @@ function myOtherSelfsname(){
 	}
 	if(!foundOtherSelf){}
 	//if(character.name=="Logic" && !myOtherSelfname=="Logic"){
-	//	myOtherSelfis = get_player(myOtherSelfname)
+	//	myOtherSelfis = get_player(myOtherSelfname);
 	//}
 	//
 	//if(character.name=="Scriptkiddie" && !myOtherSelfname=="Scriptkiddie"){
-	//	myOtherSelfis = get_player(myOtherSelfname)
+	//	myOtherSelfis = get_player(myOtherSelfname);
 	//}
 	return myOtherSelfis
 }
 
-function UseHPPot() {
+function UseHPPot(){
+	return
 	if(can_heal(character) && can_use("hppotion")){
 		//======== percent based healing ========
-		if(getCChp()<=trigger_HPLow5){  //20%
-			//use('use_hp');
-			//set_message("DrankHP!");
-		}else if(getCChp()<=trigger_HPLow4){  //30%
-			//use('use_hp');
-			//set_message("DrankHP!");
-			
-		}else if(getCChp()<=trigger_HPLow3){  //40%
-			//use('use_hp');
-			//set_message("DrankHP!");
-		}else if(getCChp()<=trigger_HPLow2){  //50%
-			//use('use_hp');
-			//heal(character)
-			//set_message("CastHeal!");
-		}else if(getCChp()<=trigger_HPLow1){  //60%
+		if(
+			getCChp()<=trigger_HPLow5
+			|| getCChp()<=trigger_HPLow4
+			|| getCChp()<=trigger_HPLow3
+			|| getCChp()<=trigger_HPLow2
+			|| getCChp()<=trigger_HPLow1
+			|| getMAhp>=trigger_HPLossAmt5
+			|| getMAhp>=trigger_HPLossAmt4
+			|| getMAhp>=trigger_HPLossAmt3
+			|| getMAhp>=trigger_HPLossAmt2
+			|| getMAhp>=trigger_HPLossAmt1
+		){
 			use('use_hp');
-			set_message("DrankHP!");
-		//======== amount based healing ========
-		}else if(character.max_hp-trigger_HPLossAmt5<=character.hp){  //750
-			//use('use_hp');
-			//set_message("DrankHP!");
-		}else if(character.max_hp-trigger_HPLossAmt4<=character.hp){  //650
-			//use('use_hp');
-			//set_message("DrankHP!");
-		}else if(character.max_hp-trigger_HPLossAmt3<=character.hp){  //550
-			//use('use_hp');
-			//set_message("DrankHP!");
-		}else if(character.max_hp-trigger_HPLossAmt2<=character.hp){  //450
-			//use('use_hp');
-			//set_message("DrankHP!");
-		}else if(character.max_hp-trigger_HPLossAmt1<=character.hp){  //350
-			use('use_hp');
-			set_message("DrankHP!");
+			set_message("UsedHPPot");
 		}
 	}
 	return 
 }
 
-function UseMPPot() {
+function UseMPPot(){
 	if(can_heal(character) && can_use("mppotion")){
 		//force use if MP<25%
-		if(character.mp/character.max_mp<=0.25){
+		if(getCCmp()<=0.25 || getMAmp()>amt_MP){
 			use('use_mp');
 			set_message("UsedMPPot");
 		};
-		if(getMAmp(character)>amt_MP){
-			use('use_mp');
-			set_message("UsedMPPot");
-			};
 	};
-	return 
+	return
 }
 
 function LeastLife(targ1,targ2){
@@ -457,27 +446,37 @@ function HealerModeSelf(){
 	return
 }
 
+captain = ""
 function EnergizeCaptain(){
-	captain = get_player("Logic")
-	if(captain && can_use("energize")){
-		//mpperc = getCCmp(captain)
-		//missingmp = getMAmp(captain)
-		//if(mpperc>=0.25 || missingmp>=800){
-			use_skill("energize",captain);
-		//}
+	if(!can_use("energize")){return};
+	
+	let captain = get_player("Logic")
+	//let captain = get_player("Boozn")
+	if((!captain || targ_nextEnergize!=captain.name) && targ_nextEnergize){
+		captain = get_player(targ_nextEnergize);
+	}
+	if(captain){
+		use_skill("energize",captain);
 	}
 	
+	if(targ_nextEnergize===""){
+		use_skill("energize","Logic");
+		targ_nextEnergize="Boozn"
+	}
+	
+	if(captain.name=="Logic" || targ_nextEnergize===""){targ_nextEnergize="Boozn"};
+	if(captain.name=="Boozn"){targ_nextEnergize="Logic"};
 }
 
 function MerchantBuffMode(){
 	
 	//use("mluck",character);
 	rangeamt = character.range;
-	for (id in parent.entities) {
+	for (id in parent.entities){
         let current = parent.entities[id];
-        if (!current || current.type != "character" || current.rip || current.invincible || current.npc || tooFar(current,320) || !can_use("mluck") || current.name===last_Buffed) {continue};
+        if(!current || current.type != "character" || current.rip || current.invincible || current.npc || tooFar(current,320) || !can_use("mluck") || current.name===last_Buffed){continue};
 		GL(current.slots["elixir"]);
-		if (inSameParty(current) || ismyOtherSelf(current)){
+		if(inSameParty(current) || ismyOtherSelf(current)){
 			GL("BuffFriend:"+current.name);
 			use("mluck",current);
 			last_Buffed += current.name;
@@ -498,88 +497,86 @@ function HealerMode(){
 	healamt = character.attack
 	//next_HealTarget = ""
 	
-	for (id in parent.entities) {
+	for (id in parent.entities){
         let current = parent.entities[id];
-        if (!current || current.type != "character" || current.rip || current.invincible || current.npc || getMAhp(current)==0) {continue};
-		if (inSameParty(current) || ismyOtherSelf(current)){
-			
-			if(parent.distance(character, current) <= rangeamt){
-			if(needsHeal(current,healamt) || current.hp/current.max_hp<=0.65){
-			if(next_HealTarget){
-				next_HealTarget = LeastLife(current,next_HealTarget)
-				//GL("ChgTar:"+next_HealTarget)
-				
-			}else{
-				next_HealTarget = current
-				//GL("NHT:"+current)
-				
-			}  //if next_HealTarget
-			}  //if needsHeal or hp < 65%
+        if(!current || current.type != "character" || current.rip || current.invincible || current.npc || getMAhp(current)==0){continue};
+		if(inSameParty(current) || ismyOtherSelf(current)){
+			if(!tooFar(current,rangeamt)){
+				if(needsHeal(current,healamt) || getCChp(current)<=0.65){
+					if(next_HealTarget){
+						next_HealTarget = LeastLife(current,next_HealTarget);
+						//GL("ChgTar:"+next_HealTarget);
+						
+					}else{
+						next_HealTarget = current
+						//GL("NHT:"+current);
+						
+					}  //if next_HealTarget
+				}  //if needsHeal or hp < 65%
 			}  //if in range
-			//};
-			
 		}  //if inSameParty or ismyOtherSelf
 		
-		if(!next_HealTarget && (needsHeal(current,healamt) || getCChp(current)<=0.65)){
+		if(!inSameParty(current) && (!next_HealTarget || next_HealTarget==="") && (needsHeal(current,healamt) || getCChp(current)<=0.65)){
 			next_HealTarget = current
-		} //if notargets and friendly needs heal
+		} //if notargets and friendly and needs heal
 		
 		current = ""
     }  //end for
-	
 	if(can_heal(next_HealTarget) && next_HealTarget){
-		//CastHeal(next_HealTarget)
-		heal(next_HealTarget)
-		//use("heal",next_HealTarget)
+		//CastHeal(next_HealTarget);
+		heal(next_HealTarget);
+		//use("heal",next_HealTarget);
 		
-		GL("Healed:"+next_HealTarget.id)
+		GL("Healed:"+next_HealTarget.id);
 		next_HealTarget = ""
 		
 	}
 	
-	return 
+	return
 }
-//TODO low
+
 function TankMode(){
+	if(getCCmp()<0.25 || !can_use("taunt")){return}
 	useTaunt = 0
-	if(!character.target){
-		closest = get_nearest_monster({target:"Logic",target:"EvilAltarBoy",target:"Boozn",target:"Indubitiable",target:"Scriptkiddie"});
-		//current = get_nearest_hostile()
+	closest = get_targeted_monster()
+	if(!character.target && !closest){
+		closest = get_nearest_monster({target:"Logic",target:"Boozn"});
+		//current = get_nearest_hostile();
 	}
 	
-	//Spam taunt while over 55% mana
+	if(!closest){return};
+	
+	//Spam taunt while over 25% mana
 	if(
-		character.mp/character.max_mp>=0.55
-	&&  can_use("taunt")
-    &&  closest.target!==character.name
-    &&  inSameParty(get_target_of(closest))
-    //&&  
+		closest.target!=character.name
+		&&  inSameParty(get_target_of(closest))
+		//&&  
 	) //endIf Conditions
 	
-	{ //start if routine
+	{ //startIf routine
 		useTaunt = 1
 		
 	};
 	
 	if(useTaunt){
-		GL("Cast:Taunt")
-		CastSpell("taunt",closest)
+		GL("Cast:Taunt");
+		CastSpell("taunt",closest);
 	};
 	return
- }
+}
 
 function HealerModeAoE(){
 	
 	if(tooSoon(next_HealAoEtime) || !can_use("partyheal")){return};
-	if(getCL>=80){
+	if(getCL()>=80){
 		aoeHealAmt = 800
-	}else if(getCL()>=72 && getCL<80){ //between lvls 72-80
+	}else if(getCL()>=72 && getCL()<80){ //between lvls 72-80
 		aoeHealAmt = 720
-	}else if(getCL()>=60 && getCL<72){ //between lvls 60-72
+	}else if(getCL()>=60 && getCL()<72){ //between lvls 60-72
 		aoeHealAmt = 600
-	}else if(getCL()>=40 && getCL<60){ //between lvls 40-60
+	}else if(getCL()>=40 && getCL()<60){ //between lvls 40-60
 		aoeHealAmt = 500
-	}else{ //else or below lvl 40 (1-39)
+	}else{ //else or below lvl 40 (1-39);
 		aoeHealAmt = 400
 	};
 	
@@ -588,17 +585,17 @@ function HealerModeAoE(){
 	currentHPPool = character.hp
 	healsNeededAmt = 0
 	maxHealAmtppl = 1
-	healsNeededAmt = healsNeededAmt + getMAhp(character)
+	healsNeededAmt = healsNeededAmt + getMAhp(character);
 	
-	for (id in parent.entities) {
+	for (id in parent.entities){
         let current = parent.entities[id];
 		//if(current.name==="EvilAltarBoy"){GL(current.name+","+current.hp+","+current.max_hp+","+(character.party+"_"+current.party))}
 		
-        if (current.type != "character" || current.rip || current.invincible || current.npc || !inSameParty(current)) {continue};
-		//GL(current.name+","+current.hp+","+current.max_hp+","+inSameParty(current))
+        if(current.type != "character" || current.rip || current.invincible || current.npc || !inSameParty(current)){continue};
+		//GL(current.name+","+current.hp+","+current.max_hp+","+inSameParty(current));
 		currentHPPool = currentHPPool + current.hp
 		maxHPPool = maxHPPool + current.max_hp
-		healsNeededAmt = healsNeededAmt + getMAhp(current)
+		healsNeededAmt = healsNeededAmt + getMAhp(current);
 		if(getCChp(current)<=0.55){pplwithCritHP++};
 		maxHealAmtppl++
 		
@@ -607,20 +604,20 @@ function HealerModeAoE(){
 	maxHealAmt = aoeHealAmt * maxHealAmtppl
 	groupHPPerc = (currentHPPool/maxHPPool).toFixed(2) * 100
 	
-	GL("HP: -"+healsNeededAmt+" : "+currentHPPool+" / "+maxHPPool+" : "+groupHPPerc+"%")
-	if((groupHPPerc<=trigger_HealAoETeamHPLowPerc || pplwithCritHP>trigger_HealAoETeamHPCntatCritical || healsNeededAmt>=trigger_HealAoETeamHPHealNeededAmt)){
+	GL("HP -"+healsNeededAmt+": "+currentHPPool+" / "+maxHPPool+"( "+maxHealAmt+"):"+groupHPPerc+"% "+(groupHPPerc<=trigger_HealAoETeamHPLowPerc));
+	if(groupHPPerc<=trigger_HealAoETeamHPLowPerc || pplwithCritHP>trigger_HealAoETeamHPCntatCritical || healsNeededAmt>=trigger_HealAoETeamHPHealNeededAmt){
 	//if(can_use("partyheal") && (groupHPPerc<=trigger_HealAoETeamHPLowPerc || pplwithCritHP>trigger_HealAoETeamHPCntatCritical || healsNeededAmt>=trigger_HealAoETeamHPHealNeededAmt)){
 		use("partyheal");
 		GL("PartyHeal!");
-		next_HealAoEtime = NQD(lmtr_HealAoERate,"s")
+		next_HealAoEtime = NQD(lmtr_HealAoERate,"s");
 	};
 	if(!next_HealAoEtime || next_HealAoEtime<NQD()){next_HealAoEtime = NQD(lmtr_HealAoERate/2,"s")};
 	return 
 }
 
-function compound_items() {
+function compound_items(){
   let to_compound = character.items.reduce((collection, item, index) => {
-    if (item && item.level < maxLevel && whitelist.includes(item.name)) {
+    if(item && item.level < maxLevel && compounditemsList.includes(item.name)){
       let key = item.name + item.level;
       !collection.has(key) ? collection.set(key, [item.level, index]) : collection.get(key).push(index);
     }
@@ -628,18 +625,16 @@ function compound_items() {
   }, new Map());
 
 	if(use_better_scrolls){scrollCost=240000}else{scrollCost=6400}
-  for (var c of to_compound.values()) {
+  for (var c of to_compound.values()){
     let scroll_name = use_better_scrolls && c[0] > 1 ? 'cscroll1' : 'cscroll0';
 
-    for (let i = 1; i + 2 < c.length; i += 3) {
+    for (let i = 1; i + 2 < c.length; i += 3){
       let [scroll, _] = find_item(i => i.name == scroll_name);
 	  if(character.gold < scrollCost){GL("Need more gold! "+ (scrollCost-character.gold))};
-      if (scroll == -1) {
-		//GL("Bought:"+scroll_name);
+      if(scroll == -1){
         parent.buy(scroll_name);
         return
       }
-	  //GL("Compounding")
       parent.socket.emit('compound', {
         items: [c[i], c[i + 1], c[i + 2]],
         scroll_num: scroll,
@@ -651,14 +646,14 @@ function compound_items() {
     }
   }
   
-  GL("Work Complete")
+  GL("Work Complete");
 }
 
-function find_item(filter) {
-  for (let i = 0; i < character.items.length; i++) {
+function find_item(filter){
+  for (let i = 0; i < character.items.length; i++){
     let item = character.items[i];
 
-    if (item && filter(item))
+    if(item && filter(item));
       return [i, character.items[i]];
   }
 
@@ -670,11 +665,11 @@ function offloaditems(){
 	offloadOtherChar = "Potmiddleman";
 	offload = 1;
 	if(character.name===offloadOtherChar){offload = 0};
-	GL("Offloading Items...")
+	GL("Offloading Items...");
 	for(InvNum in character.items){
 		let wItem = character.items[InvNum];
 		if(wItem){
-			let wItemcnt = (character.items[InvNum].q || 1)
+			let wItemcnt = (character.items[InvNum].q || 1);
 			sendAmt = wItemcnt
 			switch(wItem.name){
 				case "dexamulet":
@@ -715,7 +710,7 @@ function offloaditems(){
 					DepBox = "items0"
 			} //switch
 			
-			//GL(sendAmt)
+			//GL(sendAmt);
 			//if(!sendAmt || sendAmt<1){sendAmt=1};
 			if(offload && !character.bank){
 				send_item(offloadOtherChar,InvNum,sendAmt);
@@ -726,18 +721,14 @@ function offloaditems(){
 				bank_store(InvNum,DepBox,0);
 				
 			}
-			ext_offloaditems = NQD(lmtr_offloaditemsRate,"s")
+			ext_offloaditems = NQD(lmtr_offloaditemsRate,"s");
 		} //if
 		
 	} //for
 	
 	if(!tooSoon(next_offloaditems)){next_offloaditems = NQD(lmtr_offloaditemsRate,"s")}
-	//TSOL_offloaditems = NQD()
+	//TSOL_offloaditems = NQD();
 	
-}
-
-function cast(spell, target){
-	if(can_use(spell) && target){use(spell,target)}
 }
 
 function MergeMode(){
@@ -778,7 +769,7 @@ function TradeMode(){
 		//buy(wTItem.name,quant);
 	
 	}
-	//GL("Posted Items.")
+	//GL("Posted Items.");
 	
 	if(character.gold>(20*quant)){
 		if(lastSolditemname==""){
@@ -817,21 +808,73 @@ function filterItemsTradeMode(wTItem){
 	return false
 }
 
+function Exchanger(){
+	GL("Exhanging Items...");
+	for(InvNum in character.items){
+		let wItem = character.items[InvNum];
+		if(wItem && filterItemsExchanger(wItem)){
+		let wItemcnt = (character.items[InvNum].q || 1);
+		let turnincnt = ((wItemcnt-processOver)/quant);
+		if(turnincnt>=1){
+		for(xchgLoopcnt = 1;xchgLoopcnt<=turnincnt;xchgLoopcnt++){
+			GL(wItem.name);
+			setTimeout(exchange(InvNum),50);
+			break;
+		}
+		
+		}
+		}
+		
+	}
+	
+}
+
+function filterItemsExchanger(wItem){
+	//quant = 1;
+	switch(wItem.name){
+		case "candypop":
+			quant = 10;
+			processOver = 20;
+			return true
+			break;
+		case "redenvelope":
+		case "redenvelopev2":
+			quant = 1;
+			processOver = 0;
+			return true
+			break;
+		case "armorbox":
+		case "weaponbox":
+		case "gem0":
+		case "gem1":
+			quant = 1;
+			processOver = 0;
+			return true
+			break;
+		case "seashell":
+			quant = 20;
+			processOver = 0;
+			return false
+			break;
+	}
+	return false
+}
+
+
+//TODO:: 
 function autoAttack(targ_autoAttack,forceSwitch){
 	var ctarget = get_targeted_monster();
-	let target = get_nearest_monster({target:"Logic",target:"Landstander",target:"Boozn",target:"Indubitiable",target:"Scriptkiddie",target:"EvilAltarBoy"})
+	let target = get_nearest_monster({target:"Logic",target:"Landstander",target:"Boozn",target:"Indubitiable",target:"Scriptkiddie",target:"EvilAltarBoy"});
 	
 	if(targ_autoAttack && forceSwitch){
 		target=targ_autoAttack;
-		if(can_attack(target))
-		{
+		if(can_attack(target)){
 			set_message("Attack:"+character.attack);
 			attack(target);
 		}
 	}
 	
-	if(!target)
-	{
+	if(!target){
 		//target=get_nearest_monster({target:"Logic",target:"EvilAltarBoy",target:"Boozn",target:"Indubitiable",target:"Scriptkiddie",target:"Landstander"});
 		target=get_nearest_monster();
 		//if(target){change_target(target)}
@@ -839,8 +882,7 @@ function autoAttack(targ_autoAttack,forceSwitch){
 	
 	if(!in_attack_range(target)){target=get_nearest_monster()}
 
-	if(can_attack(target))
-	{
+	if(can_attack(target)){
 		set_message("Attack:"+character.attack);
 		attack(target);
 	}
@@ -872,6 +914,30 @@ function autoAssistNamesFilter(){
 }
 
 
+function cast(spell, target){
+	if(can_use(spell) && target){use(spell,target)}
+}
+
+function Multishot(){
+	if(can_use("3shot") && targetsInRangeCnt()>=3){
+		use("3shot");
+	}
+}
+
+
+function targetsInRangeCnt(){
+	let targetsFound = 0
+	let charRange = character.range
+	for (id in parent.entities){
+        let current = parent.entities[id];
+		
+        if(tooFar(current,charRange) || current.rip || current.invincible || inSameParty(current)){continue};
+		targetsFound++;
+	}
+	return targetsFound
+}
+
+
 //::TODO END
 
 setInterval(MainLooper,MainLooperRate);
@@ -894,12 +960,15 @@ function MainLooper(){
 	
 	UseMPPot();
 	if(character.ctype=="priest"){HealerModeSelf()};
+	set_message("");
+	if(character.ctype=="priest"){HealerModeAoE()};
 	UseHPPot();
 	
+	if(character.map=="main"){Exchanger};
 	if(character.ctype=="merchant"){return};
 	if(is_moving(character)){if(is_paused()){pause();};return};
-	
-	if(!character.slots.elixir){use(41)};
+	  
+	//if(!character.slots.elixir){use(41)};
 	
 	if(character.ctype=="priest"){HealerMode()};
 	if(character.ctype=="mage"){EnergizeCaptain()};
@@ -907,11 +976,12 @@ function MainLooper(){
 	
 	loot();
 	if(get_player("Potmiddleman")){offloaditems()};
+	if(get_player("xyn")){Exchanger()};
 	
 	//if(!attack_mode || character.rip || is_moving(character)) return;
 	
 	
-	if(character.ctype=="priest"){HealerModeAoE()};
+	if(character.ctype=="ranger"){Multishot()};
 	
 	
 	//autoAssist();
@@ -923,5 +993,4 @@ function MainLooper(){
 	
 	if(get_player("Potmiddleman") && character.name!="Potmiddleman" && character.gold>lmtr_SendGoldAboveAtLeast){send_gold("Potmiddleman",(character.gold-lmtr_SendGoldAboveBase))};
 	//if(is_paused()){pause()};
-	
 }
