@@ -39,7 +39,7 @@ last_Buffed						= ""
 
 //targ_autoAssistNames			= ("target:'" & arraySelfNames.join("',target:'") & "'").replace(",target:''","");
 targ_autoAssistNames			= strArrSelfNames.replace(",,", ",").replace(",", ",target:");
-targ_autoAssistNamesFilter 		= autoAssistNamesFilter
+//targ_autoAssistNamesFilter 		= autoAssistNamesFilter
 
 
 //TradeMode
@@ -428,13 +428,14 @@ function LeastLife(targ1,targ2){
 	return targ1
 }
 
+function inSameParty(wTarg){
+		return wTarg && character.party && character.party == wTarg.party
+}
+
+
 function needsHeal(target,healamt){
 	if(target.max_hp-target.hp>=healamt){return true};
 	return false
-}
-
-function inSameParty(wTarg){
-		return wTarg && character.party && character.party == wTarg.party
 }
 
 function HealerModeSelf(){
@@ -457,7 +458,7 @@ function EnergizeCaptain(){
 	}
 	if(captain){
 		use_skill("energize",captain);
-	}else if(!captain){
+	}else if(!captain && get_player("Boozn")){
 		use_skill("energize","Boozn");
 		targ_nextEnergize="Boozn"
 		
@@ -880,7 +881,7 @@ function autoAttack(targ_autoAttack,forceSwitch){
 	
 	if(!target){
 		//target=get_nearest_monster({target:"Logic",target:"EvilAltarBoy",target:"Boozn",target:"Indubitiable",target:"Scriptkiddie",target:"Landstander"});
-		target=get_nearest_monster();
+		target=get_nearest_monster({target:"Logic"});
 		//if(target){change_target(target)}
 	}
 	
@@ -893,11 +894,32 @@ function autoAttack(targ_autoAttack,forceSwitch){
 	
 }
 
+function autoAssistAttack(targ_autoAssist){
+	let attacknMe = (get_nearest_hostile({target:character.name}))
+	
+	if(attacknMe && !tooFar(attacknMe,character.range)){ autoAttack(attacknMe,true)};
+	if(attacknMe && tooFar(attacknMe,character.range)){
+		
+		
+	};
+	//followOtherSelfname = isOtherSelf();
+	//game_log(followOtherSelfname);
+	//followTarget(followOtherSelfname);
+	
+	
+	
+}
+
 function autoAssist(targ_autoAssist){
+	
+	
 	
 	//followOtherSelfname = isOtherSelf();
 	//game_log(followOtherSelfname);
 	//followTarget(followOtherSelfname);
+	
+	autoAssistAttack();
+	
 	
 }
 
@@ -923,8 +945,17 @@ function cast(spell, target){
 }
 
 function Multishot(){
-	if(can_use("3shot") && targetsInRangeCnt()>=3){
+	if(can_attack(character.target) && can_use("3shot")){
 		use("3shot");
+	}
+}
+
+function rangerMode(){
+	let targsinRange = targetsInRangeCnt();
+	if(targsinRange>=3 && character.level>=60 && character.level<=74){
+		Multishot();
+	}else if(targsinRange>=5 && character.level>=75){
+		Multishot();
 	}
 }
 
@@ -956,7 +987,7 @@ function MainLooper(){
 		setInterval(TradeMode(), lmtr_tradepostitemsRate);
 		pause();
 		
-		};
+	};
 	
 	pause();
 	if(character.rip || !god_mode){return}
@@ -966,6 +997,7 @@ function MainLooper(){
 	if(character.ctype=="priest"){HealerModeSelf()};
 	set_message("");
 	if(character.ctype=="priest"){HealerModeAoE()};
+	if(character.ctype=="priest"){HealerMode()};
 	UseHPPot();
 	
 	if(character.map=="main"){Exchanger};
@@ -974,18 +1006,17 @@ function MainLooper(){
 	  
 	//if(!character.slots.elixir){use(41)};
 	
-	if(character.ctype=="priest"){HealerMode()};
 	if(character.ctype=="mage"){EnergizeCaptain()};
 	if(character.ctype=="warrior"){TankMode()};
 	
 	loot();
-	if(get_player("Potmiddleman")){offloaditems()};
+	if(character.owner==5964017144168448 && get_player("Potmiddleman")){offloaditems()};
 	if(get_player("xyn")){Exchanger()};
 	
 	//if(!attack_mode || character.rip || is_moving(character)) return;
 	
 	
-	if(character.ctype=="ranger"){Multishot()};
+	if(character.ctype=="ranger"){rangerMode()};
 	
 	
 	//autoAssist();
@@ -995,6 +1026,6 @@ function MainLooper(){
 	//partyManager();
 	
 	
-	if(get_player("Potmiddleman") && character.name!="Potmiddleman" && character.gold>lmtr_SendGoldAboveAtLeast){send_gold("Potmiddleman",(character.gold-lmtr_SendGoldAboveBase))};
+	if(character.owner==5964017144168448 && get_player("Potmiddleman") && character.name!="Potmiddleman" && character.gold>lmtr_SendGoldAboveAtLeast){send_gold("Potmiddleman",(character.gold-lmtr_SendGoldAboveBase))};
 	//if(is_paused()){pause()};
 }
