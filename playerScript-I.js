@@ -447,30 +447,38 @@ function HealerModeSelf(){
 	return
 }
 
-captain = ""
+
 function EnergizeCaptain(){
 	if(!can_use("energize")){return};
+	if(!mainPlayerEnergize){mainPlayerEnergize = get_player("Logic");}
+	otherPlayerEnergize = get_player("Boozn") || get_player("Indubitiable");
 	
-	let captain = get_player("Logic")
-	//let captain = get_player("Boozn")
-	if((!captain || targ_nextEnergize!=captain.name) && targ_nextEnergize){
-		captain = get_player(targ_nextEnergize);
+	if(targ_nextEnergize){
+		targetPlayerEnergize = get_player(targ_nextEnergize);
+	}else if(!targ_nextEnergize){
+		targ_nextEnergize = mainPlayerEnergize;
 	}
-	if(captain){
-		use_skill("energize",captain);
-	}else if(!captain && get_player("Boozn")){
-		use_skill("energize","Boozn");
-		targ_nextEnergize="Boozn"
+	
+	if(mainPlayerEnergize==targ_nextEnergize){
+		use_skill("energize",mainPlayerEnergize);
+		targ_nextEnergize=otherPlayerEnergize;
+		GL("Energize:"+mainPlayerEnergize.name);
+		
+	}else if(otherPlayerEnergize==targ_nextEnergize){
+		use_skill("energize",otherPlayerEnergize);
+		targ_nextEnergize=mainPlayerEnergize;
+		GL("Energize:"+otherPlayerEnergize.name);
 		
 	}
 	
-	if(targ_nextEnergize===""){
-		use_skill("energize","Logic");
-		targ_nextEnergize="Boozn"
-	}
-	if(!captain){return};
-	if(captain.name=="Logic" || targ_nextEnergize===""){targ_nextEnergize="Boozn"};
-	if(captain.name=="Boozn"){targ_nextEnergize="Logic"};
+	//if(targ_nextEnergize===""){
+	//	use_skill("energize",mainPlayerEnergize);
+	//	targ_nextEnergize=otherPlayerEnergize
+	//	GL("Energize:"+captain.name)
+	//}
+	//if(!captain){return};
+	//if(captain.name==mainPlayerEnergize || targ_nextEnergize===""){targ_nextEnergize=otherPlayerEnergize};
+	//if(captain.name==otherPlayerEnergize){targ_nextEnergize=mainPlayerEnergize};
 }
 
 function MerchantBuffMode(){
@@ -985,11 +993,11 @@ function MainLooper(){
 		setInterval(MerchantBuffMode(), 250);
 		setInterval(MergeMode(), lmtr_compounditemsRate);
 		setInterval(TradeMode(), lmtr_tradepostitemsRate);
-		pause();
+		//pause();
 		
 	};
 	
-	pause();
+	//pause();
 	if(character.rip || !god_mode){return}
 	set_message("");
 	
